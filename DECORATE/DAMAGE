@@ -1,0 +1,94 @@
+//OK listen up this is slightly complicated.
+//All damages are defined depending if they are used by enemies, by allies and by the player.
+//Impact damage is meant to be "non-elemental" damage, or melee damage. Always have all attacks do some impact damage, to ensure some damage always passes
+//onto enemies that are fully immune to elemental energy. This is a possibility, and will make combat potentially unwinnable, so never do it.
+//The reasoning is that if you hurl a fireball to a fire elemental, the fire won't do damage, but the impact of the fireball will.
+//This is so companions can use elemental attacks without harming the player. Companions also can't harm NPCs, so they don't cause damage you don't want.
+//Enemies harm players and helpers and npcs. Player is immune to its own damage.
+//The prefix for every damage type is:
+//Pl_<element>: Player elements/effects
+//Al_<element>: Ally elements/effects
+//En_<element>: Enemy elements/effects
+
+
+//Special damage (environment, etc)=================================================================
+
+DamageType Anomaly { NOARMOR } //Spatial anomaly damage
+DamageType EPDIE { NOARMOR } //EP death damage
+
+
+//Player damages====================================================================================
+DamageType Pl_Impact {}
+
+//Core sphere
+DamageType Pl_Spirit {}
+
+//Planet sphere
+DamageType Pl_Fire {}
+DamageType Pl_Water {}
+DamageType Pl_Wind {}
+DamageType Pl_Earth {}
+
+//Sky sphere
+DamageType Pl_Electric {}
+DamageType Pl_Cold {}
+DamageType Pl_Light {}
+DamageType Pl_Dark {}
+
+//Void sphere
+DamageType Pl_Gravity { NOARMOR }
+DamageType Pl_Infinity { NOARMOR } //Dimensional Police only.
+
+//Player effects:
+DamageType Pl_Stun {}
+DamageType Pl_EMP {}
+DamageType Pl_Heal {}
+DamageType Pl_WillDrain {}
+DamageType Pl_Purify {}
+DamageType Pl_Enslave {}
+DamageType Pl_Restore {}
+DamageType Pl_Paralyze {}
+DamageType Pl_DrainHP {}
+DamageType Pl_DrainEP {}
+DamageType Pl_PoisonA {}
+DamageType Pl_PoisonB {}
+DamageType Pl_PoisonC {}
+DamageType Pl_PoisonD {}
+DamageType Pl_Displace {}
+DamageType Pl_Finisher {}
+
+
+//Enemy damages=====================================================================================
+DamageType En_Impact {}
+
+//Heart sphere
+DamageType En_Spirit {}
+
+//Planet sphere
+DamageType En_Fire {}
+DamageType En_Water {}
+DamageType En_Wind {}
+DamageType En_Earth {}
+
+//Sky sphere
+DamageType En_Electric {}
+DamageType En_Cold {}
+DamageType En_Light {}
+DamageType En_Dark {}
+
+//Void sphere
+DamageType En_Gravity { NOARMOR }
+DamageType En_Outsider { NOARMOR } //Outsiders only.
+
+//Enemy effects:
+DamageType En_Stun {}
+DamageType En_Heal {}
+DamageType En_Paralyze {}
+DamageType En_DrainHP {}
+DamageType En_DrainEP {}
+DamageType En_PoisonA {}
+DamageType En_PoisonB {}
+DamageType En_PoisonC {}
+DamageType En_PoisonD {}
+DamageType En_Displace {}
+DamageType En_Finisher {}

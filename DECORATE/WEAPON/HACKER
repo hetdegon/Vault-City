@@ -1,0 +1,95 @@
+ACTOR HC_MELEE : Weapon {
+	INVENTORY.RestrictedTo "PlHacker"
+}
+
+ACTOR HC_TAURUS_INV : WeaponItem {
+}
+
+ACTOR HC_MINOTAUROS : Weapon { //Hacker's handgun
+	INVENTORY.RestrictedTo "PlHacker"
+	WEAPON.AmmoType PISTOLCLIP //Determine projectile type from ACS, use this ammo type as just a count.
+	WEAPON.AmmoUse 0
+	+WEAPON.NOAUTOAIM
+	+WEAPON.NOAUTOFIRE
+	STATES {
+		SPAWN:
+			STOP
+		FIRE:
+			HCW1 A 2
+			HCW1 A 0 A_PlaySound("weapons/pistol", CHAN_WEAPON)
+			HCW1 A 4 ACS_NamedExecute("P_Weapon_Solidammo", 0, 1)
+			HCW1 A 4
+			HCW1 A 5 A_ReFire
+			GOTO READY
+		ALTFIRE:
+			HCW1 A 2
+			HCW1 A 0 A_PlaySound("weapons/pistol", CHAN_WEAPON)
+			HCW1 A 2 ACS_NamedExecute("P_Weapon_Solidammo", 0, 1)
+			HCW1 A 2
+			HCW1 A 0 A_PlaySound("weapons/pistol", CHAN_WEAPON)
+			HCW1 A 2 ACS_NamedExecute("P_Weapon_Solidammo", 0, 1)
+			HCW1 A 2
+			HCW1 A 0 A_PlaySound("weapons/pistol", CHAN_WEAPON)
+			HCW1 A 2 ACS_NamedExecute("P_Weapon_Solidammo", 0, 1)
+			HCW1 A 2
+			HCW1 A 8 A_ReFire
+			GOTO READY
+		FLASH:
+			STOP
+		READY:
+			HCW1 A 1 A_WeaponReady
+			LOOP
+		SELECT:
+			HCW1 A 1 A_Raise
+			LOOP
+		DESELECT:
+			HCW1 A 1 A_Lower
+			LOOP
+	}
+}
+
+ACTOR HC_DRAKE : Weapon { //Hacker's shotgun
+	INVENTORY.RestrictedTo "PlHacker"
+}
+
+ACTOR HC_ALLIGATOR : Weapon { //Hacker's rifle + grenade launcher
+	INVENTORY.RestrictedTo "PlHacker"
+}
+
+
+
+
+//Vajra Armor weapons
+ACTOR VA_MELEE : Weapon { //Vajra Armor melee
+	INVENTORY.RestrictedTo "PlHackerVajraAR1"
+}
+
+ACTOR VA_VAJRACUTTER : Weapon { //Vajra Armor Vajra Cutter
+	INVENTORY.RestrictedTo "PlHackerVajraAR1"
+}
+
+ACTOR VA_ASURABREAKER : Weapon { //Vajra Armor Asura Breaker
+	INVENTORY.RestrictedTo "PlHackerVajraAR1"
+}
+
+ACTOR VA_MICROMISSILE : Weapon { //Vajra Armor Micromissile Launchers
+	INVENTORY.RestrictedTo "PlHackerVajraAR1"
+}
+
+
+//Vajra Armor (limiter release) weapons
+ACTOR VALR_MELEE : Weapon { //Vajra Armor melee (Limiter release)
+	INVENTORY.RestrictedTo "PlHackerVajraAR2"
+}
+
+ACTOR VALR_VAJRACUTTER : Weapon { //Vajra Armor Vajra Cutter (Limiter release)
+	INVENTORY.RestrictedTo "PlHackerVajraAR2"
+}
+
+ACTOR VALR_ASURABREAKER : Weapon { //Vajra Armor Asura Breaker (+Vritra Buster) (Limiter release)
+	INVENTORY.RestrictedTo "PlHackerVajraAR2"
+}
+
+ACTOR VALR_MICROMISSILE : Weapon { //Vajra Armor Micromissile Launchers (Limiter release)
+	INVENTORY.RestrictedTo "PlHackerVajraAR2"
+}

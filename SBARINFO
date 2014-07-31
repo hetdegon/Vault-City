@@ -1,0 +1,8 @@
+Height 0;
+
+resolution 640,480;
+
+statusbar fullscreen, fullscreenoffsets, forcescaled {
+	DrawNumber 3, HUDFONT_DOOM, untranslated, ammo1, drawshadow, -25, -20;
+	DrawInventoryBar DOOM, ALWAYSSHOW|ALWAYSSHOWCOUNTER|VERTICAL|TRANSLUCENT, 16, INDEXFONT, -32, 240;
+}

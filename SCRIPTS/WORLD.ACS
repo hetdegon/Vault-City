@@ -1,0 +1,69 @@
+#library "WORLD"
+#include "zcommon.acs"
+
+//Calendar constants================================================================================
+#define DAY_LENGTH			1440
+//#define MINUTE_LENGTH 	175 //TODO(Hetdegon@2014-03-08):Define this later to a proper day length. That means spending days in-game. Well, crud.
+#define MINUTE_LENGTH 		5
+
+//Date settings. Because of the intro maps they are world vars instead of globals. All for the sake of storytelling.
+world int 0:WorldInit;
+world int 1:WorldTimer;
+world int 2:WorldDay;
+world int 3:WorldMonth;
+
+int MonthNames[12] = {"January ", "February ", "March ", "April ", "May ", "June ", "July ", "August ", "September ", "October ", "November ", "December "};
+int MonthNames_Short[12] = {"JAN ", "FEB ", "MAR ", "APR ", "MAY ", "JUN ", "JUL ", "AUG ", "SEP ", "OCT ", "NOV ", "DEC "};
+int MonthLengths[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+int SkyColors[72] = { //RGB triplets for sky colors. //TODO(Hetdegon@2014-04-06):Interpolate values?
+		2,7,35,		2,7,35,		2,7,35,		2,7,35,			//00-04
+		2,7,35,		3,10,64,		3,14,95,		4,17,134,		//05-08
+		20,25,134,	30,30,150,	32,56,162,	32,78,230,		//09-12
+		32,80,255,	32,110,255,	0,91,255,	0,92,255,		//13-16
+		134,129,255,134,129,100,167,154,149,215,191,130,	//17-20
+		121,110,98,	51,50,81,	3,10,64					};		//21-23
+
+
+function void W_SetDate(int time, int day, int month) {
+	if(!WorldInit){
+		WorldInit = true;
+		WorldTimer = time;
+		WorldDay = day;
+		WorldMonth = month;
+		Log(s:"It's now ", s:MonthNames[WorldMonth], d:WorldDay);
+	}
+}
+
+
+script "Clock" OPEN { //This should be always active, I hope.
+	//Color sky on entry.
+	int hour = (WorldTimer/60)*3;
+	Sector_SetColor(1, SkyColors[hour], SkyColors[hour+1], SkyColors[hour+2]);
+
+	Delay(MINUTE_LENGTH);
+	WorldTimer++;
+
+	//NOTE(Hetdegon@2014-04-05):Gross hack to avoid having to create a string just for padding a "0" in the minutes count.
+	int minutes = WorldTimer%60;
+	if(minutes < 10) HudMessage(s:MonthNames_Short[WorldMonth], d:WorldDay, s:" ", d:(WorldTimer/60), s:":0", d:minutes, s:"(", d:WorldTimer, s:")"; HUDMSG_PLAIN, 10, CR_GRAY, 0.92, 1.0, 1);
+	else HudMessage(s:MonthNames_Short[WorldMonth], d:WorldDay, s:" ", d:(WorldTimer/60), s:":", d:minutes, s:"(", d:WorldTimer, s:")"; HUDMSG_PLAIN, 10, CR_GRAY, 0.92, 1.0, 1);
+
+	//ClockEvents();
+	if (WorldTimer >= DAY_LENGTH) {
+		WorldDay++;
+		if (WorldDay > MonthLengths[WorldMonth]) {
+			WorldDay = 0;
+			WorldMonth++;
+			if (WorldMonth > 12){
+				WorldMonth = 0;
+			}
+		}
+		WorldTimer = 0;
+		//ClockEndOfDayEvents();
+		Log(s:"It's now ", s:MonthNames[WorldMonth], d:WorldDay);
+	} else if (WorldTimer % 60 == 0) {
+		hour = (WorldTimer/60)*3;
+		Sector_SetColor(1, SkyColors[hour], SkyColors[hour+1], SkyColors[hour+2]);
+	}
+	restart;
+}

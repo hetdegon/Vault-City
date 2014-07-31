@@ -1,0 +1,148 @@
+ACTOR AmmoBox : CustomInventory {
+	+NOGRAVITY
+	+FLOATBOB
+	INVENTORY.PickUpMessage "Pewpew acquired"
+	INVENTORY.MaxAmount 999
+}
+
+ACTOR ValidAmmoToken : Inventory {
+	INVENTORY.MaxAmount 1
+}
+
+
+//Tokens used to check if a type of ammo can be equipped by a character.
+ACTOR A_Pistol : ValidAmmoToken {}
+ACTOR A_Rifle : ValidAmmoToken {}
+ACTOR A_Shotgun : ValidAmmoToken {}
+ACTOR A_Grenade : ValidAmmoToken {}
+ACTOR A_Spiker: ValidAmmoToken {}
+
+ACTOR A_Pistol0 : AmmoBox { //☚DEFAULT
+//9mm standard ammunition. Range: ** DMG: Impact
+	TAG "9mm Standard"
+	INVENTORY.PickUpMessage "Standard pistol ammunition"
+	+INVENTORY.INVBAR
+	STATES {
+		USE:
+			TNT1 A 0 ACS_NamedExecuteWithResult("P_SetAmmo_Default", 0)
+			STOP
+	}
+}
+
+ACTOR A_Pistol1 : A_Pistol0 {
+//9mm explosive ammunition. Range: * DMG: Impact
+	TAG "9mm Explosive"
+	INVENTORY.PickUpMessage "Explosive pistol ammunition"
+	+INVENTORY.INVBAR
+	STATES {
+		USE:
+			TNT1 A 0 ACS_NamedExecuteWithResult("P_SetAmmo", 0, 1, 1024, 30)
+			STOP
+	}
+}
+
+ACTOR A_Pistol2 : A_Pistol0 {
+//9mm shock ammunition. Range: ** DMG: Electric
+	TAG "9mm Shockburst"
+	INVENTORY.PickUpMessage "Shock-burst pistol ammunition"
+	+INVENTORY.INVBAR
+	STATES {
+		USE:
+			TNT1 A 0 ACS_NamedExecuteWithResult("P_SetAmmo", 0, 2, 1536, 30)
+			STOP
+	}
+}
+
+
+ACTOR PISTOLCLIP : Ammo {
+	INVENTORY.MaxAmount 99
+}
+
+ACTOR PISTOLAMMO : Ammo {
+	INVENTORY.MaxAmount 999
+}
+
+ACTOR RIFLECLIP : Ammo {
+	INVENTORY.MaxAmount 99
+}
+
+ACTOR RIFLEAMMO : Ammo {
+	INVENTORY.MaxAmount 99
+}
+
+ACTOR SHOTGUNCLIP : Ammo {
+	INVENTORY.MaxAmount 99
+}
+
+ACTOR SHOTGUNAMMO : Ammo {
+	INVENTORY.MaxAmount 99
+}
+
+ACTOR A_Spiker0 : AmmoBox {
+//150mm spiker ammunition. Speed: ** DMG: Impact
+	TAG "150mm standard Spikers"
+	INVENTORY.PickUpMessage "Standard Spiker ammunition"
+	+INVENTORY.INVBAR
+	STATES{
+		USE:
+			TNT1 A 0 ACS_NamedExecuteWithResult("P_SetAmmo", 4, 0, 48, 64)
+	}
+}
+
+ACTOR A_Spiker1 : AmmoBox {
+//150mm crystallized spiker ammunition. Speed: ** DMG: Earth
+	TAG "150mm Crystallized Spikers"
+	INVENTORY.PickUpMessage "Crystallized Spiker ammunition"
+	+INVENTORY.INVBAR
+	STATES{
+		USE:
+			TNT1 A 0 ACS_NamedExecuteWithResult("P_SetAmmo", 4, 1, 52, 75)
+	}
+}
+
+ACTOR A_Spiker2 : AmmoBox {
+//150mm Lo-Orichalcum spiker ammunition. Speed: ** DMG: Impact
+	TAG "150mm Lo-Orichalcum Spikers"
+	INVENTORY.PickUpMessage "Lo-Orichalcum Spiker ammunition"
+	+INVENTORY.INVBAR
+	STATES{
+		USE:
+			TNT1 A 0 ACS_NamedExecuteWithResult("P_SetAmmo", 4, 1, 52, 30)
+	}
+}
+
+ACTOR A_Spiker3 : AmmoBox {
+//150mm Hyperconductor spiker ammunition. Speed: ** DMG: Electric
+	TAG "150mm Hyperconductor Spikers"
+	INVENTORY.PickUpMessage "Hyperconductor Spiker ammunition"
+	+INVENTORY.INVBAR
+	STATES{
+		USE:
+			TNT1 A 0 ACS_NamedExecuteWithResult("P_SetAmmo", 4, 1, 48, 120)
+	}
+}
+
+ACTOR A_Spiker4 : AmmoBox {
+//150mm High-Density spiker ammunition. Speed: ** DMG: Impact
+	TAG "150mm High-Density Spikers"
+	INVENTORY.PickUpMessage "High-Density Spiker ammunition"
+	+INVENTORY.INVBAR
+	STATES{
+		USE:
+			TNT1 A 0 ACS_NamedExecuteWithResult("P_SetAmmo", 4, 1, 40, 400)
+	}
+}
+
+ACTOR A_Spiker5 : AmmoBox {
+//150mm DM-Crystal spiker ammunition. Speed: ** DMG: Gravity
+	TAG "150mm DM-Crystal Spikers"
+	INVENTORY.PickUpMessage "DM-Crystal Spikers set!"
+	+INVENTORY.INVBAR
+	STATES{
+		USE:
+			TNT1 A 0 ACS_NamedExecuteWithResult("P_SetAmmo", 4, 1, 40, 1200)
+	}
+}
+
+ACTOR SPIKERCLIP : Ammo {	INVENTORY.MaxAmount 99	}
+ACTOR SPIKERAMMO : Ammo {	INVENTORY.MaxAmount 99	}

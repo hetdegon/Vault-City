@@ -1,0 +1,3 @@
+ACTOR VajraArmor : CustomInventory {
+	//The Vajra Armor...looks like a small detonator. This will allow me to transform.
+}

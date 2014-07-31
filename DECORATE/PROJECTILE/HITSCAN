@@ -1,0 +1,89 @@
+ACTOR PR_SolidAmmo {
+	+NOBLOCKMAP
+	+NOGRAVITY
+	+THRUGHOST
+	+NOFORWARDFALL
+	+FORCEXYBILLBOARD
+	-ALLOWPARTICLES
+	-RANDOMIZE
+	RenderStyle Translucent
+	Alpha 0.5
+	VSpeed 1
+	Mass 15
+	STATES {
+		SPAWN:
+			PUFF AB 4 LIGHT("Yellow32BF") BRIGHT
+			PUFF CD 4
+			STOP
+	}
+
+}
+
+ACTOR PR_Pistol0 : PR_SolidAmmo {
+	DamageType Pl_Impact
+}
+
+
+ACTOR IceCaco : Cacodemon {
+	DamageFactor Pl_Fire, 10000.0
+}
+
+ACTOR PR_Pistol1 : PR_SolidAmmo {
+	+PUFFONACTORS
+	DamageType Pl_Fire
+	Mass 30
+	VSpeed 0
+	STATES {
+			SPAWN:
+			CRASH:
+			DEATH:
+			XDEATH:
+				BAL2 ABCDE 4 LIGHT("Yellow32BF") BRIGHT
+				STOP
+	}
+}
+
+ACTOR PR_Pistol2 : PR_SolidAmmo {
+	+PUFFONACTORS
+	DamageType Pl_Electric
+	VSpeed 0
+	STATES {
+			SPAWN:
+			CRASH:
+			DEATH:
+			XDEATH:
+				ELBR ABCDEF 3 BRIGHT LIGHT("Blue32BF")
+				ELBR GHI 3 BRIGHT
+				STOP
+	}
+}
+
+ACTOR PR_Pistol3 : PR_SolidAmmo {
+	+PUFFONACTORS
+	DamageType Pl_Cold
+	VSpeed 0
+	STATES {
+			SPAWN:
+			CRASH:
+			DEATH:
+			XDEATH:
+				ELBR ABCDEF 3 BRIGHT
+				ELBR GHI 3 BRIGHT
+				STOP
+	}
+}
+
+ACTOR PR_Pistol4 : PR_SolidAmmo {
+	+PUFFONACTORS
+	DamageType Pl_Impact
+	VSpeed 0
+	STATES {
+			SPAWN:
+			CRASH:
+			DEATH:
+			XDEATH:
+				PUFF AB 4 LIGHT("Yellow32BF") BRIGHT
+				PUFF CD 4
+				STOP
+	}
+}

@@ -1,0 +1,329 @@
+ACTOR VCPlayer : PlayerPawn { //====================================================================
+	+PLAYERPAWN.CROUCHABLEMORPH //To ensure Vajra Armor Hacker, Blood Trigger Vampire and Leo Tzar work as much as possible.
+	PLAYER.ForwardMove 0.9,1
+	PLAYER.ViewHeight 36
+	PLAYER.AirCapacity 1.0
+	Health 9999
+	Radius 12
+	PainChance 255
+	Mass 100
+
+	//Core stats, can be altered
+	var int user_MHP;				//Max HP. The more the better, it represents the endurance of the body.
+	var int user_HPgrowth;		//Base amount to increase MHP with, when giving MHP upgrades.
+	var int user_EP;				//Life Force, battery power, soul, it's an amalgam of everything that keeps you alive, man or machine.
+	var int user_SP;				//Sustenance Points. Acts as hunger, can regenerate EP if high, and decrease if low.
+	var int user_MSP;				//Max sustenance points.
+	var int user_Rest;			//Your level of rest, having it low reduces your SP and can harm your game, but can last for longer than usual in games.
+	var int user_OverflowEP;	//Physical limit of the body to contain EP.
+	var int user_SPGain_BIO;	//Gain from biochemical energy. Use as a percentage.
+	var int user_SPGain_MEC;	//Gain from raw energy/electricity.
+	var int user_SPGain_SPI;	//Gain from spiritual energy.
+	var int user_SPdecay;		//Amount of SP you lose every minute.
+	var int user_RestDecay;		//Rate at which you become sleepy every minute.
+	var int user_Jump;			//Jump type, bit flag: 1) double jump 2) (if double jump) triple jump 4) flight
+	var int user_AirControl;	//Default air control. Use -1 for 0.00390625, the default zdoom value.
+
+	var int user_INIT;			//Avoid redefining the character, important to prevent resetting your stats when changing maps.
+
+//--------------------------------------------------------------------------------------------------
+// Default common damage factors
+//--------------------------------------------------------------------------------------------------
+
+	DamageFactor 1.0
+	DamageFactor "EPDIE", 100000.0
+
+
+//Immunity to damage from other players.
+	DamageFactor "Pl_Impact", 0.0
+	DamageFactor "Pl_Spirit", 0.0
+	DamageFactor "Pl_Fire", 0.0
+	DamageFactor "Pl_Water", 0.0
+	DamageFactor "Pl_Wind", 0.0
+	DamageFactor "Pl_Earth", 0.0
+	DamageFactor "Pl_Electric", 0.0
+	DamageFactor "Pl_Cold", 0.0
+	DamageFactor "Pl_Light", 0.0
+	DamageFactor "Pl_Dark", 0.0
+
+	DamageFactor "En_Impact", 1.0
+	DamageFactor "En_Spirit", 1.0
+	DamageFactor "En_Fire", 1.0
+	DamageFactor "En_Water", 1.0
+	DamageFactor "En_Wind", 1.0
+	DamageFactor "En_Earth", 1.0
+	DamageFactor "En_Electric", 1.0
+	DamageFactor "En_Cold", 1.0
+	DamageFactor "En_Light", 1.0
+	DamageFactor "En_Dark", 1.0
+
+//--------------------------------------------------------------------------------------------------
+//NOTES:
+//--------------------------------------------------------------------------------------------------
+//
+//
+//
+// Special states:
+//		DEATH.EPDIE: This is executed when you die by EP drain: Your life force fades and you can't resurrect.
+//		INIT: Called by ENTER script only once. Set up stats here. It's this way so it doesn't need per-class ACS and can be modded.
+// Damage states:
+//		For player characters, define only En_* PAIN/DEATH/XDEATH states. Team damage doesn't exist. You'll thank me for that near the end.
+}
+//==================================================================================================
+
+
+ACTOR PlHacker : VCPlayer {
+//Hacker class: Scott Kisaragi
+//Origin: US (father Japanese, born in Japan)
+//Elements: Earth, Electricity
+	PLAYER.ForwardMove 0.9, 1.0
+	PLAYER.ViewHeight 37
+	PLAYER.DisplayName "Hacker"
+
+	PLAYER.StartItem "HC_MELEE"
+	PLAYER.StartItem "HC_MINOTAUROS"
+
+	PLAYER.WeaponSlot 1, "HC_MELEE"
+	PLAYER.WeaponSlot 2, "HC_MINOTAUROS"
+
+
+	STATES{
+		INIT:
+			//Stat setup:
+			TNT1 A 0 A_SetUserVar(user_MHP, 100)
+			TNT1 A 0 A_SetUserVar(user_HPgrowth, 5)
+			TNT1 A 0 A_SetUserVar(user_EP, 850)
+			TNT1 A 0 A_SetUserVar(user_MSP, 550)
+
+			TNT1 A 0 A_SetUserVar(user_SPdecay, 15)
+			TNT1 A 0 A_SetUserVar(user_RestDecay, 5)
+			TNT1 A 0 A_SetUserVar(user_OverflowEP, 12000) //Low limit, slightly higher than a regular human because of implants.
+			TNT1 A 0 A_SetUserVar(user_SPgain_BIO, 100) //Since he's a human, full gain here.
+			TNT1 A 0 A_SetUserVar(user_SPgain_MEC, 2) //He has some implants so he can gain electrical power too.
+			TNT1 A 0 A_SetUserVar(user_SPgain_SPI, 5) //Has little gain from life force.
+			TNT1 A 0 A_SetUserVar(user_AirControl, -1)
+
+			//Equipment setup: valid ammo classes:
+			TNT1 A 0 A_GiveInventory("A_Pistol")
+			TNT1 A 0 A_GiveInventory("A_Shotgun")
+			TNT1 A 0 A_GiveInventory("A_Rifle")
+			TNT1 A 0 A_GiveInventory("A_Grenade")
+			GOTO SPAWN
+
+		SPAWN:
+			PLAY A -1
+			LOOP
+
+		SEE:
+			PLAY ABCD 4
+			LOOP
+
+		PAIN:
+			PLAY G 4 A_Pain
+			GOTO SPAWN
+
+		DEATH.EPDIE:
+			TNT1 A 0 A_Log("Your life fades away...")
+			PLAY A -1
+			STOP
+	}
+}
+
+ACTOR PlHackerVajraAR1 : PlHacker {
+//Scott: Vajra Armor
+//Origin: A-0A-DT-MAGPIE's lab
+	PLAYER.ViewHeight 40 //The surrogate mechanical body is slightly bulkier and taller than his human form.
+}
+
+ACTOR PlHackerVajraAR2 : PlHackerVajraAR1 {
+//Scott: Vajra Armor (Thunder Sutra limiter released (unlocks Vlitra Buster's Finisher)
+//Origin: A nice warm cup of kick ass, the force of human will, the desire of kicking yakuza ass and save the world. Soul and machine become one.
+	PLAYER.ViewHeight 40
+}
+
+ACTOR PlVampire : VCPlayer {
+//Vampire: Anna Westenra (passing reference to Dracula because screw subtlety)
+//Origin: UK.
+//Elements: Fire, Darkness.
+	PLAYER.ForwardMove 0.95, 1
+	PLAYER.ViewHeight 35
+	PLAYER.DisplayName "Vampire"
+	STATES{
+		INIT:
+			TNT1 A 0 A_SetUserVar(user_MHP, 100)
+			TNT1 A 0 A_SetUserVar(user_HPgrowth, 5)
+			TNT1 A 0 A_SetUserVar(user_EP, 5250) //Higher starter EP since you need more time before a good source of food comes.
+			TNT1 A 0 A_SetUserVar(user_MSP, 775)
+
+			TNT1 A 0 A_SetUserVar(user_SPdecay, 8)
+			TNT1 A 0 A_SetUserVar(user_RestDecay, 3)
+			TNT1 A 0 A_SetUserVar(user_OverflowEP, 2500000000) //Vampires suffer from no Overflow effects. She's essentially the strongest because of it.
+			TNT1 A 0 A_SetUserVar(user_SPgain_BIO, 8) //Vampires gain little from biochemistry
+			TNT1 A 0 A_SetUserVar(user_SPgain_MEC, 0) //She has no implants or machinery, so no effect.
+			TNT1 A 0 A_SetUserVar(user_SPgain_SPI, 110) //A little boost there because otherwise she'd starve every 10 minutes.
+			GOTO SPAWN
+
+		SPAWN:
+			PLAY A -1
+			LOOP
+
+		PAIN:
+			PLAY G 4 A_Pain
+			GOTO SPAWN
+	}
+}
+
+ACTOR PlVampireBloodTrigger : PlVampire {
+	PLAYER.ForwardMove 1, 1
+	PLAYER.ViewHeight 34 //It's slightly lower since she's supposed to hunch forward a bit.
+}
+
+ACTOR PlHitman : VCPlayer {
+//Hitman: Dmitry Ivanov Kovalenko
+//Origin: Russia as seen from the eyes of Russian Overkill, comrade.
+//Elements: Cold.
+	PLAYER.ForwardMove 0.8, 1
+	PLAYER.ViewHeight 40
+	PLAYER.DisplayName "Hitman"
+	STATES{
+		INIT:
+			TNT1 A 0 A_SetUserVar(user_MHP, 100)
+			TNT1 A 0 A_SetUserVar(user_HPgrowth, 5)
+			TNT1 A 0 A_SetUserVar(user_EP, 1150)
+			TNT1 A 0 A_SetUserVar(user_MSP, 600)
+
+			TNT1 A 0 A_SetUserVar(user_SPdecay, 12)
+			TNT1 A 0 A_SetUserVar(user_RestDecay, 4)
+			TNT1 A 0 A_SetUserVar(user_OverflowEP, 900000000)
+			TNT1 A 0 A_SetUserVar(user_SPgain_BIO, 90) //Part of his stomach is artificial so he gains a little less from biochemistry.
+			TNT1 A 0 A_SetUserVar(user_SPgain_MEC, 50) //His mechanical parts benefit from this one.
+			TNT1 A 0 A_SetUserVar(user_SPgain_SPI, 0) //He is less human than the Hacker therefore his gain is null.
+			TNT1 A 0 A_SetUserVar(user_AirControl, -1)
+			GOTO SPAWN
+
+		SPAWN:
+			PLAY A -1
+			LOOP
+
+		PAIN:
+			PLAY G 4 A_Pain
+			GOTO SPAWN
+	}
+}
+
+ACTOR PlHitmanMech : PlHitman {
+//Vladimir: Leo Tzar (Kaiser) Prototype
+//Origin: Leo's Laboratory
+//Elements: Cold, Fire
+	PLAYER.ViewHeight 128 //Gals dig the giant robot.
+}
+
+ACTOR PlMagician : VCPlayer {
+//Magician: Shinya Murakumo
+//Origin: Japan
+//Elements: Wind, Fire, Earth, Water.
+	PLAYER.ForwardMove 0.92, 1
+	PLAYER.ViewHeight 38
+	PLAYER.DisplayName "Magician"
+	STATES{
+		INIT:
+			TNT1 A 0 A_SetUserVar(user_MHP, 100)
+			TNT1 A 0 A_SetUserVar(user_HPgrowth, 5)
+			TNT1 A 0 A_SetUserVar(user_EP, 3000)
+			TNT1 A 0 A_SetUserVar(user_MSP, 700)
+
+			TNT1 A 0 A_SetUserVar(user_SPdecay, 20)
+			TNT1 A 0 A_SetUserVar(user_RestDecay, 8)
+			TNT1 A 0 A_SetUserVar(user_OverflowEP, 1900000000)
+			TNT1 A 0 A_SetUserVar(user_SPgain_BIO, 100) //Normal benefit from biochemistry.
+			TNT1 A 0 A_SetUserVar(user_SPgain_MEC, 0) //He has no implants or robot parts.
+			TNT1 A 0 A_SetUserVar(user_SPgain_SPI, 40) //His training allow his body to drain more life force from food.
+			GOTO SPAWN
+
+		SPAWN:
+			PLAY A -1
+			LOOP
+
+		PAIN:
+			PLAY G 4 A_Pain
+			GOTO SPAWN
+	}
+}
+
+ACTOR PlTrickster : VCPlayer { //Extra character. How to hide from initial selection?
+//Trickster class: A-0A-DT-MAGPIE "Magpie A"
+//Origin: The Sealed Dimension (Millennium Technologists HQ, activated at an unknown location)
+//Elements: Wind, Electricity, Gravity.
+	PLAYER.ForwardMove 1.0, 1.0
+	PLAYER.ViewHeight 32
+	PLAYER.AirCapacity 0.0
+	PLAYER.DisplayName "Trickster"
+	PLAYER.StartItem "TK_REDTALON"
+	PLAYER.WeaponSlot 1, "TK_REDTALON"
+	PLAYER.GruntSpeed 52
+	DamageFactor "En_Fire", 2.0
+	DamageFactor "En_Cold", 0.3
+	DamageFactor "Falling", 0.08
+
+
+	STATES{
+		INIT:
+			//Stat setup:
+			TNT1 A 0 A_SetUserVar(user_MHP, 1200)
+			TNT1 A 0 A_SetUserVar(user_HPgrowth, 25)
+			TNT1 A 0 A_SetUserVar(user_EP, 80000) //Stronger than the rest of the cast. After all, he created the Vajra Armor.
+			TNT1 A 0 A_SetUserVar(user_MSP, 9500)
+
+			TNT1 A 0 A_SetUserVar(user_SPdecay, 15)
+			TNT1 A 0 A_SetUserVar(user_RestDecay, 6)
+			TNT1 A 0 A_SetUserVar(user_OverflowEP, 200000000)
+			TNT1 A 0 A_SetUserVar(user_SPgain_BIO, 5) //He can obtain some energy by obtaining chemicals from food.
+			TNT1 A 0 A_SetUserVar(user_SPgain_MEC, 100) //A complete mechanoid, so full gain.
+			TNT1 A 0 A_SetUserVar(user_SPgain_SPI, 25) //Some life force gain from his Link Engine
+			TNT1 A 0 A_SetUserVar(user_AirControl, 10000.0)
+			TNT1 A 0 A_SetUserVar(user_Jump, 4) //Booster packs
+			//TODO: Define booster stats?
+
+			//Equipment setup: valid ammo classes:
+			TNT1 A 0 A_GiveInventory("A_Pistol")
+			TNT1 A 0 A_GiveInventory("A_Shotgun")
+			TNT1 A 0 A_GiveInventory("A_Rifle")
+			TNT1 A 0 A_GiveInventory("A_Grenade")
+			TNT1 A 0 A_GiveInventory("A_Spiker")
+
+			TNT1 A 0 A_GiveInventory("IT_Battery1", 3)
+			GOTO SPAWN
+
+		SPAWN:
+			PLAY A -1
+			LOOP
+
+		SEE:
+			PLAY ABCD 4
+			LOOP
+
+		PAIN:
+			PLAY G 4
+			PLAY G 4 A_Pain
+			GOTO SPAWN
+
+		DEATH.EPDIE:
+			TNT1 A 0 A_Log("Your system fades away...")
+			PLAY A -1
+			STOP
+
+		MISSILE:
+		MELEE:
+			GOTO SPAWN
+
+		DEATH:
+		XDEATH:
+			TNT1 A 0 A_PlayerScream
+			TNT1 A 0 A_NoBlocking
+			TNT1 A -1
+			STOP
+	}
+}
+
+Actor PlMagpie : PlTrickster {
+}

@@ -1,0 +1,390 @@
+ACTOR Food : CustomInventory {
+	//Food: Recovers EP and nutrition.
+	//Core class for inheritance.
+	+NOGRAVITY
+	+FLOATBOB
+	+INVENTORY.INVBAR
+	INVENTORY.PickUpMessage "Noms acquired"
+	INVENTORY.MaxAmount 9
+	INVENTORY.Icon "BUR1A0"
+	STATES{
+			USE:
+				//Could be done with a A_JumpIf by calling the result of P_Eat(), and having the USE state fail if false.
+				//However this way allows food to define their effects per-item, thus allowing mods without modifying the core.
+				TNT1 A 0 A_JumpIf(CallACS("P_CanEat"), "EAT")
+				TNT1 A 0 A_Log("\cjI'm not hungry")
+				FAIL
+	}
+}
+
+
+ACTOR Burger1 : Food {
+//A McReed's Bargain Burger. Nothing special, but does the job and is cheap.
+	INVENTORY.PickUpMessage "A McReed's take-out bargain burger."
+	INVENTORY.Icon "BUR1A0"
+	TAG "McReed's Bargain Burger"
+	STATES{
+		SPAWN:
+			BUR1 A -1
+			STOP
+		EAT:
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0, 100, 0, 10)
+			TNT1 A 0 A_Log("\cjNom nom")
+			STOP
+	}
+
+}
+
+ACTOR Burger2 : Food {
+//A double cheese bacon burger from McReed's. Burn the calories afterwards.
+	INVENTORY.PickUpMessage "A McReed's double cheese bacon burger."
+	TAG "McReed's Double Cheese Bacon"
+	INVENTORY.Icon "BUR2A0"
+	STATES{
+		SPAWN:
+			BUR2 A -1
+			STOP
+		EAT:
+			TNT1 A 0 A_Log("\cjNom nom nom")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  500, 0, 25)
+			STOP
+	}
+}
+
+ACTOR Burger3 : Food {
+//A McReed's Deluxe Meal. Double meat, cheese, bacon, lettuce, egg and pickles, drink and fries included!
+	INVENTORY.PickUpMessage "A McReed's Deluxe meal!"
+	TAG "McReed's Deluxe Meal"
+	INVENTORY.Icon "BUR3A0"
+	STATES{
+		SPAWN:
+			BUR3 A -1
+			STOP
+		EAT:
+			TNT1 A 0 A_Log("Nom nom nom")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  1200, 0, 40)
+			STOP
+	}
+}
+
+ACTOR Burger7 : Food {
+//Sliders from Burgerman. Six bite-size burgers at affordable prices. Flame broiled!
+	TAG "Burgerman's Sliders"
+	INVENTORY.PickUpMessage "Burgerman's sliders"
+	INVENTORY.Icon "BUR7A0"
+	INVENTORY.MaxAmount 54
+	STATES{
+		SPAWN:
+			BUR7 A -1
+			STOP
+		EAT:
+			TNT1 A 0 A_Log("Nom nom nom")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  30, 0, 5)
+			STOP
+	}
+}
+
+ACTOR Burger9 : Food {
+//A gigantic Hero Burger from Burgerman. Cholesterol +250.
+	TAG "Burgerman's Hero Burger"
+	INVENTORY.PickUpMessage "Burgerman's Hero Burger! A burger fit for a hero."
+	INVENTORY.Icon "BUR9A0"
+	STATES{
+		SPAWN:
+			BUR9 A -1
+			STOP
+		EAT:
+			TNT1 A 0 A_Log("Nom nom nom nom nom nom!")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  1200, 0, 80)
+			TNT1 A 0 ACS_NamedExecute("P_Rest", 10)
+			TNT1 A 0 ACS_NamedExecute("P_EP", 2)
+			STOP
+	}
+}
+
+ACTOR Salad1 : Food {
+//A tuna salad in a takeout bowl from McReed's.
+	TAG "McReed's Tuna Salad"
+	INVENTORY.PickUpMessage "McReed's tuna salad."
+	INVENTORY.Icon "SAL2A0"
+	STATES{
+		SPAWN:
+			SAL2 A -1
+			STOP
+		EAT:
+			TNT1 A 0 A_Log("Nom nom")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  120, 0, 10)
+			STOP
+	}
+}
+
+ACTOR Salad2 : Food {
+//A homely chicken salad from Stacy's Corner.
+	TAG "Stacy's Corner Chicken Salad"
+	INVENTORY.PickUpMessage "Stacy's Corner chicken salad."
+	INVENTORY.Icon "SAL4A0"
+	STATES{
+		SPAWN:
+			SAL4 A -1
+			STOP
+		EAT:
+			TNT1 A 0 A_Log("Nom nom")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  130, 0, 30)
+			STOP
+	}
+}
+
+//You receive 6 portions every pizza you purchase, so it's good to have.
+ACTOR Pizza1 : Food {
+//A pizza margherita from Pizza Corner.
+	TAG "Pizza Corner's Margherita"
+	INVENTORY.PickUpMessage "Pizza Corner's margherita."
+	INVENTORY.MaxAmount 54
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("Nom nom")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  150, 0, 5)
+			STOP
+	}
+}
+
+
+ACTOR SoftDrink1 : Food {
+//Power Jolt, a popular energy drink.
+	TAG "Power Jolt Energy Drink"
+	INVENTORY.PickUpMessage "A can of Power Jolt energy drink."
+	INVENTORY.Icon "SOD1A0"
+	STATES{
+		SPAWN:
+			SOD1 A -1
+			STOP
+		EAT:
+			TNT1 A 0 A_Log("Glub glub")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  100, 0, 0)
+			TNT1 A 0 ACS_NamedExecute("P_Rest", 20)
+			STOP
+	}
+}
+
+ACTOR SoftDrink2 : Food {
+//The cola brand that invented Christmas.
+	TAG "Star Cola"
+	INVENTORY.PickUpMessage "A can of Star Cola."
+	INVENTORY.Icon "SOD2A0"
+	STATES{
+		SPAWN:
+			SOD2 A -1
+			STOP
+		EAT:
+			TNT1 A 0 A_Log("Glub glub")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  60, 0, 0)
+			TNT1 A 0 ACS_NamedExecute("P_Rest", 5)
+			STOP
+	}
+}
+
+ACTOR SoftDrink6 : Food {
+//Red Sun energy drink. It will wake you up or your money back. Tastes like candy scrapes and ginseng and glows in the dark.
+	TAG "Red Sun Energy Drink"
+	INVENTORY.PickUpMessage "A can of Red Sun energy drink."
+	STATES{
+		SPAWN:
+			SOD6 A -1
+			STOP
+		EAT:
+			TNT1 A 0 A_Log("Glub glub...ew")
+			TNT1 A 0 ACS_NamedExecuteAlways("P_Eat", 0,  90, 0, 1)
+			TNT1 A 0 ACS_NamedExecuteAlways("P_Rest", 80)
+			TNT1 A 0 ACS_NamedExecuteAlways("P_EP", 10)
+			STOP
+	}
+}
+
+ACTOR Vodka2 : Food {
+//Steppes brand vodka. Very strong.
+	TAG "Steppes Vodka"
+	INVENTORY.PickUpMessage "A bottle of Steppes Vodka."
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("Glub glub...hic")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  25, 0, 0)
+			TNT1 A 0 ACS_NamedExecute("P_Rest", -10)
+			TNT1 A 0 ACS_NamedExecute("P_EP", 20)
+			STOP
+	}
+}
+
+ACTOR Vodka3 : Food {
+//Only obtainable by our favorite russian stereotype.
+//Mihail's illegal vodka. Can dig holes on concrete.
+	TAG "Mihail's Mystery Vodka"
+	INVENTORY.PickUpMessage "A bottle of mysterious Vodka."
+	INVENTORY.RestrictedTo "PlHitman"
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("Glub glub...? ...da! good stuff!")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  25, 130, 10)
+			TNT1 A 0 ACS_NamedExecute("P_Rest", -80)
+			TNT1 A 0 ACS_NamedExecute("P_EP", 130)
+			STOP
+	}
+}
+
+ACTOR Water1 : Food {
+//Regular bottled water.
+	TAG "Water"
+	INVENTORY.PickUpMessage "A bottle of water."
+	INVENTORY.MaxAmount 27 //3 uses a pop.
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("Glub glub")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  25, 0, 0)
+			STOP
+	}
+}
+
+ACTOR Water2 : Food {
+//Collected water. It might not be safe to drink.
+	TAG "Unclean Water"
+	INVENTORY.PickUpMessage "A bottle of unclean water."
+	INVENTORY.MaxAmount 27 //3 uses a pop.
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("Glub glub")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  25, 0, 0)
+			//Add check for poison here.
+			STOP
+	}
+}
+
+ACTOR Water3 : Food {
+//Regular bottled water blessed by a priest.
+	TAG "Sanctified Water"
+	INVENTORY.PickUpMessage "A bottle of sanctified water."
+	INVENTORY.MaxAmount 27 //3 uses a pop.
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("Glub glub")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  250, 0, -1)
+			STOP
+	}
+}
+
+ACTOR Beer1 : Food {
+//Duff brand beer. It's only slightly better than dirty water.
+	TAG "Duff Beer"
+	INVENTORY.PickUpMessage "A can of Duff beer."
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("Glub glub...")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  50, 0, 0)
+			TNT1 A 0 ACS_NamedExecute("P_Rest", -1)
+			STOP
+	}
+}
+
+ACTOR Beer2 : Food {
+//Heiliger brand beer. Premium German monastery stuff.
+	TAG "Heiliger Beer"
+	INVENTORY.PickUpMessage "A can of Heiliger beer."
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("Glub glub")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  250, 0, -1)
+			TNT1 A 0 ACS_NamedExecute("P_Rest", -10)
+			STOP
+	}
+}
+
+
+ACTOR Dairy1 : Food {
+	TAG "McReed's Milkshake"
+	INVENTORY.PickUpMessage "A McReed's milkshake"
+	INVENTORY.MaxAmount 18 //2 uses a pop.
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("Glub glub")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  200, 0, 10)
+			STOP
+	}
+}
+
+
+ACTOR BloodDrink1 : Food {
+//Only obtainable by our favorite vampire asskicker.
+//Artificial blood for medical purposes. It's almost as good as real blood.
+	TAG "Artificial Blood Bag"
+	INVENTORY.PickUpMessage "A bag of artificial blood"
+	INVENTORY.RestrictedTo "PlVampire", "PlVampireBloodTrigger"
+	INVENTORY.MaxAmount 27 //3 uses a pop.
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("\cj...")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  5, 0, 200)
+			TNT1 A 0 ACS_NamedExecute("P_Rest", 20)
+			TNT1 A 0 ACS_NamedExecute("P_EP", 2)
+			STOP
+	}
+}
+
+ACTOR BloodDrink2 : Food {
+//Only obtainable by our favorite vampire asskicker.
+//Donated blood for medical purposes.
+	TAG "Blood Bag"
+	INVENTORY.PickUpMessage "A bag of blood"
+	INVENTORY.RestrictedTo "PlVampire", "PlVampireBloodTrigger"
+	INVENTORY.MaxAmount 18 //2 uses a pop.
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("\cj...it's good...")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  1, 0, 550)
+			TNT1 A 0 ACS_NamedExecute("P_Rest", 20)
+			TNT1 A 0 ACS_NamedExecute("P_EP", 20)
+			STOP
+	}
+}
+
+ACTOR BloodDrink3 : Food {
+//Only obtainable by our favorite vampire asskicker.
+//Blood tainted by evil.
+	TAG "Evil Blood"
+	INVENTORY.PickUpMessage "A bag of tainted blood."
+	INVENTORY.RestrictedTo "PlVampire", "PlVampireBloodTrigger"
+	INVENTORY.MaxAmount 27 //3 uses a pop.
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("\cjS-so good...!")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  1, 1, 1250)
+			TNT1 A 0 ACS_NamedExecute("P_Rest", 30)
+			TNT1 A 0 ACS_NamedExecute("P_EP", 200)
+			STOP
+	}
+}
+
+ACTOR IT_Battery1 : Food {
+//Batteries for mechanoids.
+	TAG "Small Battery"
+	INVENTORY.PickUpMessage "A small battery"
+	INVENTORY.MaxAmount 9
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("Charge complete.")
+			TNT1 A 0 ACS_NamedExecuteAlways("P_Eat", 0,  0, 5000, 0)
+			TNT1 A 0 ACS_NamedExecuteAlways("P_EP", 500)
+			STOP
+	}
+}
+
+ACTOR IT_Battery2 : Food {
+//Batteries for mechanoids.
+	TAG "Medium Battery"
+	INVENTORY.PickUpMessage "A medium battery"
+	INVENTORY.MaxAmount 9
+	STATES{
+		USE:
+			TNT1 A 0 A_Log("Charge complete.")
+			TNT1 A 0 ACS_NamedExecute("P_Eat", 0,  0, 3000, 0)
+			TNT1 A 0 ACS_NamedExecute("P_EP", 1500)
+			STOP
+	}
+}

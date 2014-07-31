@@ -1,0 +1,286 @@
+ACTOR AC_Raiser {
+	Radius 4
+	Height 4
+	Health 5
+	Scale 2.0
+	RenderStyle "Add"
+	Alpha 0.9
+	Mass 100000
+	+NOTELEPORT
+	+MOVEWITHSECTOR
+	+SHOOTABLE
+	+THRUACTORS
+	+FLOORHUGGER
+	-SOLID
+	-COUNTKILL
+	DamageFactor "Normal", 0.0
+	DamageFactor "Pl_Purify", 9999.0
+	DamageFactor "Pl_Enslave", 9999.0
+	var int user_wait;
+	STATES {
+		SPAWN:
+			TNT1 A 0 NODELAY A_SetUserVar("user_wait", random(14, 30))
+			SOUL ABCDEFGH 2 LIGHT("Red32C")
+			SOUL IJKLMOPQR 8 LIGHT("Red32B")
+			GOTO IDLE
+		IDLE:
+			SOUL P 10 LIGHT("Red32B") A_SetUserVar("user_wait", user_wait - 1)
+			TNT1 A 0 A_JumpIf(user_wait <= 0, "DO_RAISE")
+			SOUL Q 10 LIGHT("Red32B") A_SetUserVar("user_wait", user_wait - 1)
+			TNT1 A 0 A_JumpIf(user_wait <= 0, "DO_RAISE")
+			SOUL R 10 LIGHT("Red32B") A_SetUserVar("user_wait", user_wait - 1)
+			TNT1 A 0 A_JumpIf(user_wait <= 0, "DO_RAISE")
+			LOOP
+		DEATH:
+		XDEATH:
+			TNT1 A 0 A_NoBlocking //Get out of the way.
+			TNT1 A 0 A_PlaySound("EVILNO")
+			SOUL R 2 LIGHT("Red32C")
+			SOU1 ABCDEFGHIJKLMNOPQRS 4 LIGHT("Red64C")
+			STOP
+	}
+}
+
+ACTOR DoomImpR : DoomImp replaces DoomImp {
+	DropItem "RES_DoomImp" 128
+	DropItem "ArmorShard" 32
+	DropItem "IT_Flare" 4
+	STATES {
+		PAIN.Pl_Stun:
+			TROO H 8 A_Pain
+			TROO H 8 A_SetTics(random[fallvale](16, 105))
+			GOTO SEE
+	}
+}
+
+ACTOR RES_DoomImp : AC_Raiser {
+	STATES {
+		DO_RAISE:
+			TNT1 A 0 A_NoBlocking //Get out of the way.
+			TNT1 A 0 A_SpawnItemEx ("TeleportFog",0,0,0,0,0,0,0,SXF_NOCHECKPOSITION)
+			TNT1 A 0 A_Jump(128, 2)
+			TNT1 A 0 A_SpawnItemEx ("DoomImp",0,0,0,0,0,0,0,SXF_NOCHECKPOSITION)
+			STOP
+			TNT1 A 0 A_Jump(128, 2)
+			TNT1 A 0 A_SpawnItemEx ("ImpX",0,0,0,0,0,0,0,SXF_NOCHECKPOSITION)
+			STOP
+			TNT1 A 0 A_Jump(4, 2)
+			TNT1 A 0 A_SpawnItemEx ("ImpZ",0,0,0,0,0,0,0,SXF_NOCHECKPOSITION)
+			STOP
+			TNT1 A 0 A_SpawnItemEx ("ImpY",0,0,0,0,0,0,0,SXF_NOCHECKPOSITION)
+			STOP
+
+		DEATH.Pl_Enslave:
+		XDEATH.Pl_Enslave:
+			TNT1 A 0 A_NoBlocking
+			TNT1 A 0 A_PlaySound("EVILNO")
+			TNT1 A 0 A_SpawnItemEx ("IT_ImpOrb",0,0,0,0,0,0,0,SXF_NOCHECKPOSITION)
+			STOP
+	}
+}
+
+Actor ImpX : DoomImpR {
+	Scale 1.1
+	Health 180
+	Speed 9
+	PainChance 180
+	Translation "64:79=112:127"
+	+MISSILEMORE
+	+MISSILEEVENMORE
+	-COUNTKILL
+
+	DropItem "RES_DoomImp" 128
+	DropItem "HealthBonusX" 255
+	DropItem "IT_RandomGrenade" 8
+	DropItem "IT_Flare" 32
+	STATES{
+		MISSILE:
+			TROO F 4 A_FaceTarget
+			TROO G 0 A_CustomMissile("DoomImpBall_Poison", 34, 0, 0, CMF_AIMOFFSET)
+			TROO F 4
+			GOTO SEE
+	}
+}
+
+ACTOR DoomImpBall2 : DoomImpBall replaces DoomImpBall {
+	+FORCEXYBILLBOARD
+	DamageType "En_Fire"
+}
+
+ACTOR DoomImpBall_Poison : DoomImpBall {
+	+FORCEXYBILLBOARD
+	Translation "0:255=%[0.00,0.00,0.00]:[1.20,2.00,0.94]"
+	PoisonDamage 25
+	STATES{
+		SPAWN:
+			BAL1 A 4 BRIGHT
+			TNT1 A 0 A_SpawnItemEx("DoomImpBall_Poison_Trail",0,0,0,0,0,0,0,SXF_NOCHECKPOSITION|SXF_TRANSFERTRANSLATION)
+			LOOP
+	}
+}
+
+ACTOR DoomImpBall_Poison_Trail {
+	+NOINTERACTION
+	+NOGRAVITY
+	+CLIENTSIDEONLY
+	+BRIGHT
+	+FORCEXYBILLBOARD
+	STATES{
+		SPAWN:
+			BAL1 A 1 A_FadeOut(0.1)
+			LOOP
+	}
+}
+
+ACTOR ImpZ : DoomImpR {
+	Scale 1.15
+	Health 250
+	Speed 10
+	Translation "64:79=168:191"
+
+	+MISSILEMORE
+	+MISSILEEVENMORE
+	+AVOIDMELEE
+	+QUICKTORETALIATE
+	+NOPAIN
+	+NOINFIGHTING
+	-COUNTKILL
+
+	DropItem "HealthBonusX" 255 2
+	DropItem "IT_RandomGrenade" 255
+	STATES{
+		Missile:
+			TROO F 4 A_FaceTarget
+			TROO G 0 A_CustomMissile("DoomImpBall", 50, 0, 0, CMF_AIMOFFSET)
+			TROO G 0 A_CustomMissile("DoomImpBall", 34, 10, 0, CMF_AIMOFFSET)
+			TROO G 6 A_CustomMissile("DoomImpBall", 34, -10, 0, CMF_AIMOFFSET)
+			TROO F 4
+			Goto See
+	}
+}
+
+ACTOR ImpY : DoomImpR {
+	Scale 0.9
+	Health 1
+	Speed 10
+	Translation "64:79=128:143"
+
+	+AVOIDMELEE
+	+NEVERTARGET
+	+FRIGHTENED
+	+THRUSPECIES
+	+NOINFIGHTING
+	-MISSILEMORE
+	-MISSILEEVENMORE
+	-COUNTKILL
+
+	DropItem "HealthBonusX" 255 5
+	DropItem "ArmorShard" 255 5
+
+
+}
+
+ACTOR ImpF : DoomImpR {
+	Translation "64:79=80:111"
+	DamageFactor "Pl_Stun", 0.1
+	+FRIENDLY
+	+NOINFIGHTING
+	+AVOIDMELEE
+	+MISSILEMORE
+	-COUNTKILL
+}
+
+ACTOR ZombieManR : ZombieMan replaces ZombieMan {
+	DropItem "RES_ZombieMan" 255
+	DropItem "ArmorShard" 8 1
+	DropItem "LostSoul" 3
+	DropItem "IT_FreezeGrenade" 1
+}
+
+
+//Not for Vault City
+
+
+ACTOR IT_ImpOrb : CustomInventory {
+	+FLOATBOB
+	+NOGRAVITY
+	+INVENTORY.INVBAR
+	+INVENTORY.PICKUPFLASH
+	INVENTORY.Icon "ENORA0"
+	INVENTORY.PickUpMessage "You captured an Imp's soul"
+	INVENTORY.MaxAmount 1
+	Tag "Imp Soul Orb"
+	STATES {
+		SPAWN:
+			ENOR A 4
+			LOOP
+		USE:
+			TNT1 A 0 A_FireCustomMissile("MSL_ImpSummon", 0, false, -1, 0, false, 0.05)
+			STOP
+
+	}
+}
+
+ACTOR MSL_ImpSummon {
+	Speed 32
+	Radius 4
+	Height 4
+	Mass 20
+	Damage 0
+	+NOBLOCKMAP
+	+DROPOFF
+	+MISSILE
+	+EXPLODEONWATER
+	+GRENADETRAIL
+	BounceType "Grenade"
+	BounceCount 1
+	DeathSound "imp/shotx"
+	STATES{
+		SPAWN:
+			PLSS A 4 LIGHT("White64B")
+			LOOP
+		DEATH:
+			TNT1 A 0 A_SpawnItemEx ("ImpF",0,0,0,0,0,0,0,SXF_NOCHECKPOSITION)
+			STOP
+	}
+}
+
+ACTOR Spawner 15002 {
+	+ISMONSTER
+	+NEVERTARGET
+	+NOBLOCKMAP
+	+NOGRAVITY
+	+LOOKALLAROUND
+	SeeSound "demon/sight"
+	STATES {
+		SPAWN:
+			TNT1 A 0 NODELAY Thing_ChangeTID(0, 7001)
+			GOTO IDLE
+
+		IDLE:
+			PLSS AB 4 A_Look
+			LOOP
+
+		SEE:
+			PLSS A 4 A_SetTics(random(50, 100))
+			TNT1 A 0 A_JumpIfInTargetLOS("SEE", 80, false, 0)
+			TNT1 A 0 A_SpawnItemEx("TeleportFog")
+			TNT1 A 0 A_SpawnItemEx("DoomImp")
+			LOOP
+	}
+
+}
+
+ACTOR IT_RandomGrenade {
+	STATES{
+		SPAWN:
+			TNT1 A 0 NODELAY A_Jump(128, 2)
+			TNT1 A 0 A_SpawnItemEx("IT_FreezeGrenade",0,0,0,0,0,0,0,SXF_NOCHECKPOSITION)
+			STOP
+			TNT1 A 0 A_Jump(128, 2)
+			TNT1 A 0 A_SpawnItemEx("IT_StunGrenade",0,0,0,0,0,0,0,SXF_NOCHECKPOSITION)
+			STOP
+			TNT1 A 0 A_SpawnItemEx("IT_HEGrenade",0,0,0,0,0,0,0,SXF_NOCHECKPOSITION)
+			STOP
+	}
+}

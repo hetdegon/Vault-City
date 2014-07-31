@@ -1,0 +1,15 @@
+ACTOR WeaponItem : CustomInventory {
+	//Weapon Item: Use to equip a weapon.
+	//Core class for inheritance.
+	+NOGRAVITY
+	+FLOATBOB
+	+INVENTORY.INVBAR
+	INVENTORY.PickUpMessage "Noms acquired"
+	INVENTORY.MaxAmount 9
+	INVENTORY.Icon "BUR9A0"
+}
+
+
+#include DECORATE/WEAPON/AMMO
+#include DECORATE/WEAPON/HACKER
+#include DECORATE/WEAPON/TRICKSTER

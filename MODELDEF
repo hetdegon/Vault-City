@@ -1,0 +1,54 @@
+MODEL MSL_Spiker0 {
+	PITCHFROMMOMENTUM
+	INHERITACTORPITCH
+	Path "MODELS"
+	Model 0 "SPIKER.MD3"
+	Skin 0 "SPIKER.PNG"
+	Scale 1.2 1.0 1.0
+	FrameIndex SPKR A 0 0
+}
+
+MODEL FX_RingBurst {
+	PITCHFROMMOMENTUM
+	Path MODELS
+	Model 0 "RING.MD3"
+	Scale 2.0 2.0 2.0
+	Skin 0 "SPIKER.PNG"
+	FrameIndex RING A 0 0
+}
+
+MODEL FX_CylinderBurst {
+	ROTATING
+	Rotation-Speed 6.0
+	Rotation-Vector 0.0 1.0 0.0
+	Path "MODELS"
+	Model 0 "CRING.MD3"
+	Skin 0 "CRING.PNG"
+	Scale 1.0 1.0 1.0
+	FrameIndex CRNG A 0 0
+	FrameIndex CRNG B 0 1
+	FrameIndex CRNG C 0 2
+}
+
+MODEL FX_Beam {
+	PITCHFROMMOMENTUM
+	INHERITACTORPITCH
+	Path "MODELS"
+	Model 0 "BEAM.MD3"
+	Skin 0 "CRING.PNG"
+	Scale 6.0 0.9 0.9
+	FrameIndex LASR A 0 0
+	FrameIndex LASR B 0 1
+}
+
+MODEL GSLAVE {
+	INTERPOLATEDOUBLEDFRAMES
+	ROTATING
+	Rotation-Speed 2.0
+	Rotation-Vector 0.0 1.0 0.0
+	Path "MODELS"
+	Model 0 "GSLAVE.MD3"
+	Skin 0 "GSLAVE.PNG"
+	Scale 6.0 6.0 6.0
+	FrameIndex GSLV A 0 0
+}

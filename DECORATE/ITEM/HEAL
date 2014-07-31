@@ -1,0 +1,12 @@
+ACTOR HealthBonusX : HealthBonus {
+	+FLOATBOB
+	+NOGRAVITY
+	INVENTORY.Amount 4
+	INVENTORY.MaxAmount 9999
+	INVENTORY.PickUpMessage "You picked up some healing potion"
+	STATES {
+		SPAWN:
+			HPUP A -1
+			STOP
+	}
+}

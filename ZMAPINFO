@@ -1,0 +1,78 @@
+DEFAULTMAP {
+	KeepFullInventory
+	StrifeFallingDamage
+	MonsterFallingDamage
+	AllowJump
+	AllowCrouch
+	AllowFreelook
+	SmoothLighting
+	UsePlayerStartZ
+	SpawnWithWeaponRaised
+	FogDensity = 32
+}
+
+
+CLUSTER 1 { //Vault City
+	HUB
+}
+
+
+MAP MAP01 "SECTOR A1" {
+	sky1 = "SKY2"
+	cluster = 1
+	par = 0
+	music = "SHADRN10"
+}
+
+MAP MAP02 "SECTOR A2" {
+	sky1 = "SKY2"
+	cluster = 1
+	par = 0
+	music = "SOR2_09"
+}
+
+
+GAMEINFO {
+	NoRandomPlayerClass = true
+	//PlayerClasses="PlHacker", "PlVampire", "PlHitman", "PlMagician", "PlDetective", "PlNurse", "PlTrickster", "PlKid"
+	//PlayerClasses="PlHacker", "PlVampire", "PlHitman", "PlMagician", "PlTrickster"
+	PlayerClasses="PlTrickster", "PlHacker", "PlVampire", "PlHitman", "PlMagician"
+}
+
+CLEARSKILLS
+
+SKILL VEasy {		Name = "Very Easy"	Aggressiveness = 0.8		ACSReturn = 1	SpawnFilter = 1
+	FriendlyHealth = 1.5
+	EasyKey
+}
+
+SKILL Easy {		Name = "Easy"			Aggressiveness = 0.9		ACSReturn = 2	SpawnFilter = 1
+	FriendlyHealth = 1.2
+	EasyKey
+}
+
+SKILL Normal {		Name = "Normal"		Aggressiveness = 1.0		ACSReturn = 3	SpawnFilter = 2
+	EasyKey
+	//DefaultSkill
+}
+
+SKILL Hard {		Name = "Hard"			Aggressiveness = 1.0		ACSReturn = 4	SpawnFilter = 2
+}
+
+SKILL VHard {		Name = "VHard"			Aggressiveness = 1.0		ACSReturn = 5	SpawnFilter = 3
+	FastMonsters
+}
+
+SKILL Mania {		Name = "Mania"			Aggressiveness = 1.0		ACSReturn = 6	SpawnFilter = 3
+	FastMonsters
+}
+
+SKILL Halloween {	Name = "Halloween"	Aggressiveness = 1.0		ACSReturn = 7	SpawnFilter = 5
+	DisableCheats
+	FastMonsters
+}
+
+SKILL Debug {		Name = "Debug"			Aggressiveness = 1.0		ACSReturn = 8	SpawnFilter = 3
+	EasyKey
+	DefaultSkill
+}

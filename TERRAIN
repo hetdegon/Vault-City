@@ -1,0 +1,21 @@
+SPLASH Water{
+	SmallClass 			WaterSplashBase
+	SmallClip 			12
+	SmallSound 			world/drip
+
+//	BaseClass 			PlasmaBall
+//	ChunkClass 			PlasmaBall
+	ChunkXvelShift 	8
+	ChunkXvelShift 	8
+	ChunkXvelShift 	8
+	ChunkBaseZvel		2
+	Sound					world/watersplash
+}
+
+TERRAIN TurquoiseWater {
+	Splash Water
+	FootClip 10
+	LIQUID
+}
+
+Floor TWATER TurquoiseWater

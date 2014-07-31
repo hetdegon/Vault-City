@@ -1,0 +1,9 @@
+MODNAME="VAULT.PK3"
+ACC=/home/storage/Games/Doom/TOOLS/ACC/acc
+rm $MODNAME
+
+$ACC SCRIPTS/WORLD.ACS ACS/WORLD
+$ACC SCRIPTS/ACTOR.ACS ACS/ACTOR
+$ACC SCRIPTS/MAP.ACS ACS/MAP
+7za a -tzip -mx=0 -xr\!*.bak ./$MODNAME * &>/dev/null
+#xdg-open $MODNAME

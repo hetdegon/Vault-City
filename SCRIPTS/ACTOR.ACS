@@ -1,0 +1,532 @@
+#library "ACTOR"
+#include "zcommon.acs"
+//Fallvale-style actor and player functions.
+//Lots of features are missing from the not-yet-finished original, but going for as much as possible.
+//As for now, we'll settle with core stats, skills and we will leave body customization out of the scene. MAYBE.
+
+/*
+New stats:
+
+EP (Energy Points):
+
+		Your skills and some items require EP, which is an oversimplification of your raw life energy. The more the better,
+	however, after a certain amount, your body will be unable to contain your energy, causing damage over time. This can be solved in some ways.
+	Skills have more power the more EP you invest on them, so make sure to keep it as high as possible.
+	By the way, having no EP means you have no life force left, therefore your very soul is gone, so don't run out of it either.
+
+SP (Sustenance points):
+		Linked to EP directly. SP is obtained from food or energy sources like batteries, and acts as an EP buffer that decreases over time.
+	Characters have a bonus to SP depending on the item consumed, so the Hacker as a human gains it from food, but since he has some implants, he can
+	take a decreased amount from batteries as well, or the vampire only gains SP from things that had a soul. SP will reduce over time on its own.
+
+
+Rest (Rest...just rest):
+		It's how well-rested your character is. How much it decreases over time if at all is character-specific and is restored by
+	sleeping a certain amount of time. A full gauge can give you at least two days, minimum. Stimulants can "rest" you in the spot.
+	Characters with heavy implants or non-humans barely need any sleep, but benefit from doing it once in a while.
+	You lose SP and EP every minute when your rest hits 0.
+
+EP and SP relation:
+		Using any skill or item that takes EP will draw 80% of its cost from the SP buffer, and the remaining from the EP storage.
+		If there isn't enough SP to take the cost, it'll be paid in EP instead.
+		If SP is below 10%, the cost will be paid in EP as well.
+		If SP is 0%, you will lose a small amount of EP over time instead of SP.
+		If SP is above 50%, you regenerate EP over time.
+
+*/
+
+
+//Constants=========================================================================================
+#define ZDOOM_MINUTE			2100
+#define AIRCONTROL_DEFAULT	0.00390625
+#define MAX_PLAYER 			4
+
+
+//Stat constants
+#define HP_MAX					9999			//Classic.
+#define EP_MAX					2000000000	//Not enough. Eh, should do. MAYBE.
+#define REST_MAX				2000			//No point in having variable REST maximums per-character. You are rested or you aren't. Could make it 100, but since ints are massive anyway, why not use them.
+#define MAX_WEAPON 			4				//4 weapons per character. I might change this in the future though.
+
+#define STATS							17
+	#define STAT_INIT					0
+	#define STAT_MHP					1
+	#define STAT_HPGROWTH			2
+	#define STAT_EP					3
+	#define STAT_EP_OVERFLOW		4
+	#define STAT_SP					5
+	#define STAT_MSP					6
+	#define STAT_SP_DECAY			7
+	#define STAT_SPGAIN_BIO			8
+	#define STAT_SPGAIN_MEC			9
+	#define STAT_SPGAIN_SPI			10
+	#define STAT_REST					11
+	#define STAT_REST_DECAY			12
+	#define STAT_OVERDRIVE			13
+	#define STAT_HAD_OVERFLOW		14
+	#define STAT_JUMPTYPE			15
+	#define STAT_AIRCONTROL			16
+
+
+#define JUMPT_SINGLE					0
+#define JUMPT_DOUBLE					1
+#define JUMPT_TRIPLE					2
+#define JUMPT_DOUBLE_HOLD			3
+#define JUMPT_BOOSTERS				4
+#define JUMPT_VG_BOOSTERS			5
+
+//Ammunition stats
+#define AMMO_CLASSES					7
+	#define AMMOCL_PISTOL			0
+	#define AMMOCL_REVOLVER			1
+	#define AMMOCL_RIFLE				2
+	#define AMMOCL_SHOTGUN			3
+	#define AMMOCL_GRENADE			4
+	#define AMMOCL_SPIKER			5
+	#define AMMOCL_FUEL				6
+
+#define AMMO_CLASS_DATA				2
+	#define AMMOCLD_NAME				0
+	#define AMMOCLD_DESC				1
+
+#define AM_AMOUNT_PISTOL			16
+#define AM_AMOUNT_REVOLVER			9
+#define AM_AMOUNT_RIFLE				10
+#define AM_AMOUNT_SHOTGUN			9
+#define AM_AMOUNT_GRENADE			34
+#define AM_AMOUNT_SPIKER			5
+#define AM_AMOUNT_FUEL				5
+//I am so sorry for this. But it's better than a complex access with better but more intensive results.
+#define AMMO_AMOUNTS					AM_AMOUNT_PISTOL + AM_AMOUNT_REVOLVER + AM_AMOUNT_RIFLE + AM_AMOUNT_SHOTGUN + AM_AMOUNT_GRENADE + AM_AMOUNT_SPIKER + AM_AMOUNT_FUEL
+
+#define AMMO_DATA 					7
+	#define AM_NAME					0
+	#define AM_DESC					1
+	#define AM_MISSILE				2
+	#define AM_RANGE_SPEED			3
+	#define AM_DAMAGE					4
+	#define AM_PELLETS				5
+	#define AM_HITSCAN				6
+
+//Weapon Stats
+#define WEAPON_DATA					16
+	#define WP_COOLDOWN				0
+	#define WP_SPREAD					1
+	#define WP_RANGE					2
+	#define WP_TUNEUPS				3
+	#define WP_CHAOSGEM				4
+	#define WP_TWO_AMMO_TYPES		5
+	#define WP_DRAIN1					6
+	#define WP_DAMAGE1				7
+	#define WP_AMMOCLASS1			8
+	#define WP_AMMOTYPE1				9
+	#define WP_CAPACITY1				10
+	#define WP_DRAIN2					11
+	#define WP_DAMAGE2				12
+	#define WP_AMMOCLASS2			13
+	#define WP_AMMOTYPE2				14
+	#define WP_CAPACITY2				15
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int AmmoClassData[AMMO_CLASSES * AMMO_CLASS_DATA] = {
+	"Pistol", "9mm pistol rounds",
+	"Revolver", "Large-caliber revolver rounds",
+	"Rifle", "Military-grade rifle rounds",
+	"Shotgun", "Shotgun shells",
+	"Grenade", "Grenades",
+	"Spiker", "150mm Spiker rounds",
+	"Fuel", "Liquid fuel cells",
+};
+
+int AmmoTypeData[AMMO_AMOUNTS * AMMO_DATA * AMMO_CLASSES] = {
+	//Pistol rounds
+	"9mm regular",			"Basic 9mm pistol ammunition", "A_Pistol0", 2048, 32, false, true,
+	"9mm tactical",		"Superior consumer-grade 9mm ammunition", "A_Pistol1", 3072, 64, false, true,
+	"9mm explosive",		"This pistol ammunition causes a small explosion on impact", "A_Pistol2", 1024, 48, false, true,
+	"9mm stun",				"Can stun the target with an electric shock", "A_Pistol3", 2048, 48, false, true,
+	"9mm freeze",			"Contains gas that freezes the target internally", "A_Pistol4", 1024, 48, false, true,																//5
+	"9mm S-GLASS",			"Fires a S-Glass bullet that shatters for a weak spread area of effect", "A_Pistol5", 512, 24, false, false,
+	"9mm poison red",		"Delivers a toxin that causes damage over time", "A_Pistol6", 2048, 24, false, true,
+	"9mm poison green",	"Contains a chemical compound that increases the damage the target receives", "A_Pistol7", 2048, 24, false, true,
+	"9mm poison blue",	"Makes the target more vulnerable to effects from other poisons", "A_Pistol8", 2048, 24, false, true,
+	"9mm poison yellow",	"Contains a highly acidic agent that also damages machines heavily", "A_Pistol9", 2048, 32, false, true,										//10
+	"9mm poison violet", "Affects the central nervous system causing temporary paralysis", "A_PistolA", 2048, 32, false, true,
+	"9mm poison cyan",	"Releases a fluid, that makes the target vulnerable to fire and electric damage", "A_PistolB", 2048, 32, false, true,
+	"9mm poison white",	"Target becomes unable to restore HP or EP by normal means", "A_PistolC", 2048, 32, false, true,
+	"9mm poison black",	"The target is damaged by its own energy, losing EP and HP over time", "A_PistolD", 2048, 24, false, true,
+	"9mm military",		"Military-grade pistol ammunition. High quality", "A_PistolE", 3072, 64, false, true,																//15
+	"9mm impact pulse",	"Damaging, military-grade variant of the 9mm 'shock' rounds", "A_PistolF", 3072, 48, false, true,												//16
+
+	//Revolver rounds
+	".46 regular",			"Basic .46 revolver ammunition", "A_Revolver0", 1536, 48, false, true,
+	".46 explosive", 		"Causes a small explosion on impact", "A_Revolver1", 1024, 64, false, true,
+	".46 piercer", 		"Drill-shaped design allows this round to pierce through targets", "A_Revolver2", 1024, 48, false, true,
+	".46 T-AZRAEL", 		"Designed exclusively for demon-hunting Clerics", "A_Revolver3", 2048, 128, false, true,
+	".46 demolition",		"Detonates on impact like a small grenade", "A_Revolver4", 512, 92, false, true,																		//5
+	".46 army",				"Military-grade revolver ammunition of high quality", "A_Revolver5", 1024, 128, false, true,
+	".46 P-SHADE",			"Detonates with an energy that causes more damage on the absence of light", "A_Revolver6", 1536, 128, false, true,
+	".46 VAnGuard",		"Ammunition used on VAnGuard suit handguns, reffited for civilian use","A_Revolver7", 2048, 128, false, true,
+	".46 D-CRYSTAL",		"Creates a relatively low-density microscopic black hole on impact", "A_Revolver8", 2048, 312, false, false,								//9
+
+	//Rifle rounds
+	"5.56 regular",		"Standard rifle ammunition", "A_Rifle0", 2048, 48, false, true,
+	"5.56 army",			"Military-grade rifle ammunition", "A_Rifle0", 2048, 48, false, true,
+	"5.56 LR", 				"Designed for longer ranges", "A_Rifle0", 4096, 48, false, true,
+	"5.56 sniper",			"Best for long distance combat", "A_Rifle0", 2048, 48, false, true,
+	"5.56 AP",				"Capable of piercing enemy armor", "A_Rifle0", 2048, 48, false, true,																					//5
+	"5.56 VAnGuard",		"Ammunition standard for VanGuard suits", "A_Rifle0", 2048, 48, false, true,
+	"5.56 ROT-D",			"Doused in demon blood, causes more damage on biological targets", "A_Rifle0", 2048, 48, false, true,
+	"5.56 piercer",		"Can perfortate targets", "A_Rifle0", 2048, 48, false, true,
+	"5.56 drill burst",	"High-performance piercing rounds, high power and penetration", "A_Rifle0", 2048, 48, false, true,
+	"5.56 Vajra",			"Designed for exclusive use of the Asura Breaker rifle", "A_Rifle0", 4096, 256, false, true,														//10
+
+	//Shotgun shells.
+	"regular shell",	"Basic buckshot shells for shotguns", "A_Shotgun0", 1024, 24, 7, true,
+	"slugshot shell", "Fires a single, high-velocity slug. Pierces targets", "A_Shotgun1", 2048, 64, false, true,
+	"MM shell", "Fires a single micromissile", "MSL_Shotgun0", 48, 80, false, false,
+	"incendiary shell", "Causes fire damage and leaves burning traces on the ground", "A_Shotgun2", 1024, 32, 6, true,
+	"army shell", "High-quality shotgun shells for military use", "A_Shotgun3", 1536, 48, 8, true,																				//5
+	"stun shell", "Fires a dart that shocks the target", "MSL_Shotgun1", 48, 40, false, false,
+	"NX-Fiber shell", "Fires needles made from an advanced fiber mesh. Pierces targets", "A_Shotgun4", 2048, 16, 12, true,
+	"grenade shell", "Fires a single small explosive", "MSL_Shotgun2", 32, 120, false, false,
+	"poison yellow shell", "Projects a spray of corrosive fluid that also damages machines", "MSL_Shotgun3", 16, 64, false, false,									//9
+
+	//Grenades.
+		//Utility
+	"Flare", "Provides light in dark areas", "MSL_Flare0", 16, 0, false, false,
+	"Hi-Flare", "Improved flare for illumination of large dark areas", "MSL_FLare1", 16, 0, false, false,
+	"healing grenade", "Restores ally HP (Organic)", "MSL_Grenade0", 16, 0, false, false,
+	"nanorepair grenade", "Restores ally HP (Machines)", "MSL_Grenade1", 16, 0, false, false,
+		//Explosive
+	"Demolition grenade", "Explosive grenade", "MSL_Grenade2", 24, 128, false, false, 																								//5
+	"HE grenade", "A much more powerful type of explosive grenade", "MSL_Grenade3", 24, 128, false, false,
+		//Shrapnel/Cluster
+	"shrapnel grenade", "Scatters large amounts of shrapnel on detonation",	"MSL_Grenade4", 24, 64, false, false,
+	"G-CLAYMORE grenade", "Scatters massive amounts of shrapnel on detonation", "MSL_Grenade5", 24, 64, false, false,
+	"Flak grenade", "Behaves more similarly to a shotgun shell, producing a spread shot", "A_Grenade0", 1024, 64, 6, true,
+	"Kinetic grenade", "Pushes targets for weak damage but strong repulsion force", "MSL_Grenade7", 24, 32, false, false, 												//10
+		//Motion effect
+	"stun grenade", "Releases a weak shockwave that stuns nearby organic enemies", "MSL_Grenade8", 24, 32, false, false,
+	"EMP grenade", "Releases a strong shockwave that paralyzes anything in range", "MSL_Grenade9", 24, 64, false, false,
+		//Poison gas
+	"poison red grenade", "Spreads a poisonous cloud that causes damage over time", "MSL_GrenadeGas0", 20, 0, false, false,
+	"poison green grenade", "Spreads a poisonous cloud that increases the damage the target receives", "MSL_GrenadeGas1", 20, 0, false, false,
+	"poison blue grenade", "Spreads a poisonous cloud that makes the target more vulnerable to other poisons", "MSL_GrenadeGas2",	20, 0, false, false, 		//15
+	"poison yellow grenade", "Spreads a poisonous cloud that damages any target, even machines", "MSL_GrenadeGas3", 20, 0, false, false,
+	"poison violet grenade", "Spreads a poisonous cloud that causes paralysis", "MSL_GrenadeGas4", 20, 0, false, false,
+	"poison cyan grenade", "Spreads a poisonous cloud that makes the target vulnerable to fire and electric damage", "MSL_GrenadeGas5", 20, 0, false, false,
+	"poison white grenade", "Spreads a poisonous cloud that makes the target unable to restore HP and EP", "MSL_GrenadeGas6", 20, 0, false, false,
+	"poison black grenade", "Spreads a poisonous cloud that makes the target lose HP and EP gradually", "MSL_GrenadeGas7", 20, 0, false, false, 					//20
+		//Elemental
+	"incendiary grenade", "Explodes in a fiery explosion causing fire damage", "MSL_GrenadeEL0", 24, 128, false, false,
+	"shockwave grenade", "Activates a coil on impact, causing electric damage on the area", "MSL_GrenadeEL1", 24, 128, false, false,
+	"freeze grenade", "Releases freezing gas on explosion, causing cold damage", "MSL_GrenadeEL2", 24, 128, false, false,
+	"sonic burst grenade", "Fires a sound wave generator on triggering, causing wind damage", "MSL_GrenadeEL3", 24, 128, false, false,
+	"shard grenade", "Releases gemstone shards on explosion, causing earth damage", "MSL_GrenadeEL4", 24, 128, false, false, 											//25
+	"luminic grenade", "Releases photon high-velocity on explosion, causing light damage", "MSL_GrenadeEL5", 24, 128, false, false,
+	"hydrowave grenade", "On explosion, vaporizes its payload of compressed fluids, causing water damage", "MSL_GrenadeEL6", 24, 128, false, false,
+	"spirit grenade", "Covered in ancient runes, causes a magical burst that causes spirit damage", "MSL_GrenadeEL7", 24, 128, false, false,
+	"ROT-D grenade", "Contains a fluid created from demon blood, that is vaporized on impact, causing dark damage", "MSL_GrenadeEL8", 24, 128, false, false,
+	"graviton grenade", "Contains D-CRYSTAL shards that collapse when shattered, causing gravity damage", "MSL_GrenadeEL9", 24, 128, false, false, 				//30
+		//Special
+	"plasma grenade", "Produces a temporary plasma field that causes fire and electric damage", "MSL_GrenadeA", 24, 128, false, false,
+	"P-SHADE grenade", "Causes a more powerful explosion in absence of light", "MSL_GrenadeB", 24, 128, false, false,
+	"D-CRYSTAL grenade", "This is a custom D-CRYSTAL grenade that creates a microscopic black hole on impact", "MSL_GrenadeC", 24, 128, false, false,
+	"Vajra missile", "Custom missiles for the Vajra Launcher, excellent homing capability. Does combined earth and electric damage.", "MSL_GrenadeD", 48, 64, 6, false, //34
+
+	//Spikers
+	"150mm Lo-Orichalcum Spiker", "Generated from depleted Orichalcum. Weak, but inexpensive.", "MSL_Spiker0", 32, 192, false, false,
+	"150mm standard Spiker", "Standard Spikers for railguns", "MSL_Spiker1", 32, 256, false, false,
+	"150mm crystallized Spiker", "Cools down quickly and becomes brittle, exploding in several shards", "MSL_Spiker2", 32, 128, false, false,
+	"150mm Hi-Density Spiker", "Made of a denser metal, they can't fly as far, but have superior piercing abilities", "MSL_Spiker3", 24, 400, false, false,	//5
+	"150mm Hyperconductor Spiker", "These Spikers gather electrical energy, releasing an electric shock on impact", "MSL_Spiker4", 32, 256, false, false,
+	"150mm D-Crystal Spiker", "Only Magpie A can create them. Generates a powerful microscopic black hole", "MSL_Spiker5", 32, 1024, false, false,				//6
+
+	//Fuels
+	"Gasoline", "A highly flammable fuel, causes fire damage", "MSL_Fuel0", 8, 32, 2, false,
+	"Poison Yellow", "Becomes highly acidic when heated and in contact of air, can damage machines", "MSL_Fuel1", 12, 32, 2, false,
+	"ROT-D", "A bio-hazardous fluid developed from demon blood. Burns intensely in contact of life", "MSL_Fuel2", 8, 48, 2, false,
+	"T-AZRAEL", "Developed from holy water, burns into bright flames that cleanse darkness", "MSL_Fuel3", 16, 48, 2, false,
+	"LTR-EX 725-B", "A high-performance and expensive coolant. It will freeze any surface", "MSL_Fuel4", 6, 64, 3, false,												//5
+};
+
+//Global stuff======================================================================================
+global bool 0:PlayerInit;
+
+//Swap arrays for weapon setup.
+global int 1:Player_Stats[];
+global int 2:Player_WeaponSetup[];	//int Player_WeaponSetup[MAX_WEAPON][WEAPON_DATA]; (multiply MAX_PLAYER)
+
+//Stuff that doesn't need to be global
+int HUD_lastSPgain, HUD_lastRestgain;
+int HUD_SPgainTimer, HUD_RestgainTimer;
+bool HUD_hide = false; //Don't draw the hud when true, such as in scenes or Finishers.
+
+script "P_Init" OPEN {
+	if(!PlayerInit) {
+		PlayerInit = true;
+		Player_Stats[STATS] = true;
+		Player_WeaponSetup[(MAX_WEAPON*WEAPON_DATA) + 1] = true;
+	}
+	HUD_hide = true; //Hide HUD for now until the player is initialized.
+}
+
+
+script "P_SetAmmo" (int class, int puff, int range, int damage){
+	if(class > AMMO_CLASSES){ //Just a safety check to not get out of bounds.
+		SetResultValue(false);
+		terminate;
+	}
+}
+
+script "P_Weapon_SolidAmmo" (int Wslot) {
+	Wslot = Wslot * WEAPON_DATA;
+	//LineAttack(0, GetActorAngle(0), GetActorPitch(0), damage, puff, "None", range, FHF_NORANDOMPUFFZ);
+}
+
+function int cropSP(int SP, int MSP){
+	if (SP <= 0) SP = 0; else if (SP >= MSP) SP = MSP;
+	return SP;
+}
+
+function int cropRest(int Rest){
+	if (Rest < 0) Rest = 0; else if (Rest > REST_MAX) Rest = REST_MAX;
+	return Rest;
+}
+
+function void P_Overflow(int amount, int tid){
+	//Energy is escaping your body and it hurts.
+}
+
+
+
+function void HUD_EP_Update(int EP){
+	SetFont("BIGFONT");
+	if(Player_Stats[STAT_OVERDRIVE]){
+		int rnd = random(0, 1000000000);
+		if(rnd % 16 == 0) HudMessage(s:"OVERDRIVE"; HUDMSG_PLAIN, 4, CR_ORANGE, 0.009, 0.975, 1);
+		else HudMessage(s:"EP: ", d:rnd; HUDMSG_PLAIN, 4, CR_CYAN, 0.009, 0.975, 1);
+	} else HudMessage(s:"EP: ", d:EP; HUDMSG_PLAIN, 4, CR_CYAN, 0.009, 0.975, 1);
+}
+
+function void HUD_Update(void) {
+	//Update HUD.
+	int HPcolor, SPcolor, RestColor;
+	int minutes;
+	SetFont("SMALLFONT");
+	int HP = GetActorProperty(0, APROP_Health);
+	int MHP = Player_Stats[STAT_MHP];
+	int cash = CheckInventory("Cash");
+
+	if(HP <= MHP/8) HPcolor = CR_RED;
+	else if(HP <= MHP/2) HPcolor = CR_ORANGE;
+	else HPcolor = CR_GRAY;
+	HudMessage(s:"HP: ", d:HP, s:" / ", d:MHP; HUDMSG_PLAIN, 1, HPcolor, 0.009, 0.904, 1);
+
+	if(Player_Stats[STAT_SP] >= Player_Stats[STAT_MSP] / 2) SPcolor = CR_LIGHTBLUE;
+	else if (Player_Stats[STAT_SP] > 100) SPcolor = CR_GRAY;
+	else if (Player_Stats[STAT_SP] > 0) SPcolor = CR_ORANGE;
+	else SPcolor = CR_RED;
+	HudMessage(s:"SP: ", d:Player_Stats[STAT_SP], s:" / ", d:Player_Stats[STAT_MSP]; HUDMSG_PLAIN, 2, SPcolor, 0.009, 0.925, 1);
+
+	if(HUD_SPgainTimer > 0){
+		HudMessage(s:"+", d:HUD_lastSPgain; HUDMSG_ALPHA, 7, CR_GREEN, 0.26, 0.925, 0.9, (FixedDiv(HUD_SPgainTimer<<16, 60.0)) );
+		HUD_SPgainTimer--;
+	}
+	if(Player_Stats[STAT_REST] >= 200) RestColor = CR_GRAY;
+	else if (Player_Stats[STAT_REST] > 0) RestColor = CR_BLUE;
+	else RestColor = CR_RED;
+
+	HudMessage(s:"REST: ", d:Player_Stats[STAT_REST], s:" / ", d:REST_MAX; HUDMSG_PLAIN, 3, RestColor, 0.01, 0.945, 1);
+	if(HUD_RestgainTimer > 0){
+		HudMessage(s:"+", d:HUD_lastRestgain; HUDMSG_ALPHA, 8, CR_CYAN, 0.26, 0.945, 0.9, (FixedDiv(HUD_RestgainTimer<<16, 60.0)) );
+		HUD_RestgainTimer--;
+	}
+
+	HUD_EP_Update(Player_Stats[STAT_EP]);
+	SetFont("SMALLFONT");
+	HudMessage(s:"$: ", d:cash; HUDMSG_PLAIN, 5, CR_GRAY, 0.92, 0.98, 1);
+	//Draw crosshair here?
+
+}
+
+script "InitPlayer" ENTER {
+	int init = ( GetUserVariable(0, "user_INIT") );
+	if (init == false) {
+		Thing_ChangeTID(0, 1); //Player TID is 1. No multiplayer support, sorry.
+		Player_Stats[STAT_REST] = 1500; //SetUserVariable(0, "user_Rest", 1500);
+		Player_Stats[STAT_SP] = 250;
+		SetUserVariable(0, "user_SP", 250); //A default starting value just because.
+		SetActorState(0, "INIT"); //Enter INIT state to initialize base stats. This is done like this so they can be defined in DECORATE and easier to mod.
+
+		Player_Stats[STAT_MHP] = GetUserVariable(0, "user_MHP");
+		SetActorProperty(0, APROP_Health, Player_Stats[STAT_MHP]); //Full health
+		Player_Stats[STAT_HPGROWTH] = GetUserVariable(0, "user_HPGROWTH");
+		Player_Stats[STAT_EP] = GetUserVariable(0, "user_EP");
+		Player_Stats[STAT_EP_OVERFLOW] = GetUserVariable(0, "user_OverflowEP");
+		Player_Stats[STAT_SP] = GetUserVariable(0, "user_SP");
+		Player_Stats[STAT_SP_DECAY] = GetUserVariable(0, "user_SPdecay");
+		Player_Stats[STAT_REST_DECAY] = GetUserVariable(0, "user_RestDecay");
+		Player_Stats[STAT_MSP] = GetUserVariable(0, "user_MSP");
+		Player_Stats[STAT_SPGAIN_BIO] = GetUserVariable(0, "user_SPGain_BIO");
+		Player_Stats[STAT_SPGAIN_MEC] = GetUserVariable(0, "user_SPGain_MEC");
+		Player_Stats[STAT_SPGAIN_SPI] = GetUserVariable(0, "user_SPGain_SPI");
+		Player_Stats[STAT_OVERDRIVE] = true;
+		Player_Stats[STAT_JUMPTYPE] = GetUserVariable(0, "user_Jump");
+		Player_Stats[STAT_AIRCONTROL] = GetUserVariable(0, "user_Aircontrol");
+		if(Player_Stats[STAT_AIRCONTROL] < 0) Player_Stats[STAT_AIRCONTROL] = AIRCONTROL_DEFAULT;
+		SetAirControl(Player_Stats[STAT_AIRCONTROL]);
+		GiveInventory("Cash", 500); //500 bucks is not much but hey.
+		SetUserVariable(0, "user_INIT", true);
+	}
+	HUD_hide = false;
+}
+
+function void P_UpdateStats(void){
+		int EPdecay = 0;  //Set up passive skill drain here?
+		int SPdecay = Player_Stats[STAT_SP_DECAY], RestDecay = Player_Stats[STAT_REST_DECAY];
+
+		//Update Rest value.
+		Player_Stats[STAT_REST] = cropRest(Player_Stats[STAT_REST] - Player_Stats[STAT_REST_DECAY]);
+		if(Player_Stats[STAT_REST] == 0) { //Check for tiredness penalty: Doubles SP consumption and takes some EP.
+			SPdecay = SPdecay * 2;
+			EPdecay += RestDecay * 2;
+		} //TODO(Hetdegon@2014-03-14):Screw SP decay value. Make it so it tries to use passive skill EP costs instead.
+
+		//Update SP value.
+		Player_Stats[STAT_SP] = cropSP(Player_Stats[STAT_SP] - SPdecay, Player_Stats[STAT_MSP]);
+		if(Player_Stats[STAT_SP] == 0) EPdecay += SPdecay; //Starving: Life force gets depleted.
+		//TODO(Hetdegon@2014-03-14):eat a snack!
+		else if(Player_Stats[STAT_SP] > Player_Stats[STAT_MSP] / 2) { //Sustenance is converted into energy.
+			EPdecay -= 125; //TODO(Hetdegon@2014-03-14):Hell no, take the EP regeneration value from....somewhere.
+		}
+		if(EPdecay != 0) EP_Give(-EPdecay);
+}
+
+script "P_Mainloop" ENTER {
+	int count = 0, hudcount = 0;
+	int jumptimer = 0, booster_maxZspeed, booster_Zaccel, Zspeed;
+	int input, oldinput;
+	while(true){
+		count++;
+		input = GetPlayerInput(-1, INPUT_BUTTONS);
+		oldinput = GetPlayerInput(-1, INPUT_OLDBUTTONS);
+		if(!HUD_hide){
+			HUD_Update();
+		}
+		//After a minute update stats.
+		if(count >= ZDOOM_MINUTE){
+			P_UpdateStats();
+			count = 0;
+		}
+		if(GetActorZ(0) > GetActorFloorZ(0) && Player_Stats[STAT_JUMPTYPE] != JUMPT_SINGLE){
+				Zspeed = GetActorVelZ(0);
+				jumptimer++;
+				switch(Player_Stats[STAT_JUMPTYPE]){
+					case JUMPT_DOUBLE:{
+					}
+					break;
+
+					case JUMPT_TRIPLE:{
+					}
+					break;
+
+					case JUMPT_DOUBLE_HOLD:{
+					}
+					break;
+
+					case JUMPT_BOOSTERS:{
+						if(input&BT_JUMP && jumptimer > 10){
+							if(input&BT_SPEED) booster_maxZspeed = 20.0; else booster_maxZspeed = 12.0;
+							if(Zspeed > -8.5) booster_Zaccel = 1.7; else booster_Zaccel = 2.3;
+							if(Zspeed < booster_maxZspeed) SetActorVelocity(0, GetActorVelX(0), GetActorVelY(0), Zspeed + booster_Zaccel, false, false);
+							EP_Give(-1);
+						}
+					break;
+
+					case JUMPT_VG_BOOSTERS:{
+					}
+					}
+				}
+		} else jumptimer = 0;
+		delay(1);
+	}
+}
+
+script "T_Print" (int val){
+	log(s:"Val=",d:val,s:"/",f:val);
+}
+
+script "P_Eat" (int _SP_BIO, int _SP_MEC, int _SP_SPI) {
+	//We filter the results based on the player's attributes.
+	int SP_BIO = FixedMul(_SP_BIO, Player_Stats[STAT_SPGAIN_BIO]*0.01);
+	int SP_MEC = FixedMul(_SP_MEC, Player_Stats[STAT_SPGAIN_MEC]*0.01);
+	int SP_SPI = FixedMul(_SP_SPI, Player_Stats[STAT_SPGAIN_SPI]*0.01);
+	int gain = SP_BIO + SP_MEC + SP_SPI;
+	Log(s:"Restored ", d:gain, s:" SP (BIO:",d:SP_BIO, s:" MEC:", d:SP_MEC, s:" SPI:", d:SP_SPI, s:")");
+	HUD_lastSPgain = gain;
+	HUD_SPgainTimer = 70;
+	Player_Stats[STAT_SP] = cropSP(Player_Stats[STAT_SP] + Gain, Player_Stats[STAT_MSP]);
+}
+
+script "P_Rest" (int amount){
+	if (amount == 0) terminate; else {
+		HUD_RestgainTimer = 70;
+		HUD_lastRestgain = amount;
+		Player_Stats[STAT_REST] = cropRest(Player_Stats[STAT_REST] + amount);
+	}
+}
+
+function void P_EPdeath(void){ //You are done for, a past person, an ex-living, gone forever.
+	Thing_Damage2(0, 999999, "EPDIE"); //Deals a lot of EPDIE damage. It will make the character jump to DEATH.EPDIE, and the death sequence is handled there.
+	//There is apparently no way to disable the silly "player killed itself" message. Feature request is needed to set ubituaries by...damagetype?
+}
+
+function void EP_Give(int amount){
+	if(amount == 0 || Player_Stats[STAT_OVERDRIVE]) return;
+
+	if(amount > 0){
+		Player_Stats[STAT_EP] += amount;
+	} else {
+		amount = -amount;
+		if(amount == 1){ //A bit of a special case.
+				if(Player_Stats[STAT_SP] >= Player_Stats[STAT_MSP] / 4){
+					Player_Stats[STAT_SP]--;
+				} else {
+					Player_Stats[STAT_EP]--;
+				}
+		} else {
+			int SPcost = (amount * 0.8) >> 16;
+			//If the SP is more than 1/4 (at that point it will *only* degrade over time), it buffers 80% of the cost.
+			if(Player_Stats[STAT_SP] >= Player_Stats[STAT_MSP] / 4 && SPcost <= Player_Stats[STAT_SP]){
+				Player_Stats[STAT_SP] -= SPcost;
+				Player_Stats[STAT_EP] -= amount - SPcost;
+			} else Player_Stats[STAT_EP] -= amount;
+		}
+	}
+	if(Player_Stats[STAT_EP] < 0) { Player_Stats[STAT_EP] = 0; P_EPdeath(); }
+	if(Player_Stats[STAT_EP] > EP_MAX) Player_Stats[STAT_EP] = EP_MAX;
+	if(Player_Stats[STAT_EP] > Player_Stats[STAT_EP_OVERFLOW]) P_Overflow(Player_Stats[STAT_EP] - Player_Stats[STAT_EP_OVERFLOW], 0);
+	if(Player_Stats[STAT_SP] < 0) Player_Stats[STAT_SP] = 0;
+	if(Player_Stats[STAT_SP] > Player_Stats[STAT_MSP]) Player_Stats[STAT_SP] = Player_Stats[STAT_MSP];
+}
+
+script "P_EP" (int amount) {
+	EP_Give(amount);
+}
+
+//Stat cost checks:
+script "P_CanEat" (void) {
+	if(Player_Stats[STAT_SP] >= Player_Stats[STAT_MSP]) {
+		SetResultValue(false);
+		terminate;
+	} else SetResultValue(true);
+}
+
+script "P_CheckEP" (int cost) {
+	if( cost >= Player_Stats[STAT_EP] ) {
+		SetResultValue(false);
+		terminate;
+	} else SetResultValue(true);
+}

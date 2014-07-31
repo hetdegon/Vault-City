@@ -1,0 +1,19 @@
+ACTOR Drug : CustomInventory {
+	//Drugs: Don't do them, kids.
+	//Core class for inheritance.
+	INVENTORY.PickUpMessage "Time to do drugs!"
+	INVENTORY.MaxAmount 9
+}
+
+ACTOR CaffeinePill : Drug {
+//Caffeine pills. A classic to stay awake.
+	TAG "Caffeine Pills"
+	INVENTORY.PickUpMessage "Some caffeine pills."
+	INVENTORY.MaxAmount 45 //5 uses a pop.
+	+INVENTORY.INVBAR
+	STATES {
+		USE:
+			TNT1 A 350 ACS_NamedExecute("P_Rest", 0, 50)
+			LOOP
+	}
+}

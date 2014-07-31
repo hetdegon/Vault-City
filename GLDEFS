@@ -1,0 +1,108 @@
+POINTLIGHT HiFlare {	Color 1.00 0.95 0.71	Size 1024}
+
+POINTLIGHT Blue32A {	Color 0.00 0.00 0.33	Size 32 }
+POINTLIGHT Blue32B {	Color 0.00 0.00 0.66	Size 32 }
+POINTLIGHT Blue32C {	Color 0.00 0.00 1.00	Size 32 }
+POINTLIGHT Blue64A {	Color 0.00 0.00 0.33	Size 64 }
+POINTLIGHT Blue64B {	Color 0.00 0.00 0.66	Size 64 }
+POINTLIGHT Blue64C {	Color 0.00 0.00 1.00	Size 64 }
+POINTLIGHT Blue128A {	Color 0.00 0.00 0.33	Size 128 }
+POINTLIGHT Blue128B {	Color 0.00 0.00 0.66	Size 128 }
+POINTLIGHT Blue128C {	Color 0.00 0.00 1.00	Size 128 }
+
+POINTLIGHT Green32A {	Color 0.00 0.33 0.00	Size 32 }
+POINTLIGHT Green32B {	Color 0.00 0.66 0.00	Size 32 }
+POINTLIGHT Green32C {	Color 0.00 1.00 0.00	Size 32 }
+POINTLIGHT Green64A {	Color 0.00 0.33 0.00	Size 64 }
+POINTLIGHT Green64B {	Color 0.00 0.66 0.00	Size 64 }
+POINTLIGHT Green64C {	Color 0.00 1.00 0.00	Size 64 }
+POINTLIGHT Green128A {	Color 0.00 0.33 0.00	Size 128 }
+POINTLIGHT Green128B {	Color 0.00 0.66 0.00	Size 128 }
+POINTLIGHT Green128C {	Color 0.00 1.00 0.00	Size 128 }
+
+POINTLIGHT Red32A {	Color 0.33 0.00 0.00	Size 32 }
+POINTLIGHT Red32B {	Color 0.66 0.00 0.00	Size 32 }
+POINTLIGHT Red32C {	Color 1.00 0.00 0.00	Size 32 }
+POINTLIGHT Red64A {	Color 0.33 0.00 0.00	Size 64 }
+POINTLIGHT Red64B {	Color 0.66 0.00 0.00	Size 64 }
+POINTLIGHT Red64C {	Color 1.00 0.00 0.00	Size 64 }
+POINTLIGHT Red128A {	Color 0.33 0.00 0.00	Size 128 }
+POINTLIGHT Red128B {	Color 0.66 0.00 0.00	Size 128 }
+POINTLIGHT Red128C {	Color 1.00 0.00 0.00	Size 128 }
+
+POINTLIGHT White32A {	Color 0.33 0.33 0.33	Size 32 }
+POINTLIGHT White32B {	Color 0.66 0.66 0.66	Size 32 }
+POINTLIGHT White32C {	Color 1.00 1.00 1.00	Size 32 }
+FLICKERLIGHT White32AF {	Color 0.33 0.33 0.33	Size 32	secondarySize 48	chance 0.4 }
+FLICKERLIGHT White32BF {	Color 0.66 0.66 0.66	Size 32	secondarySize 48	chance 0.4 }
+FLICKERLIGHT White32CF {	Color 1.00 1.00 1.00	Size 32	secondarySize 48	chance 0.4 }
+POINTLIGHT White64A {	Color 0.33 0.33 0.33	Size 64 }
+POINTLIGHT White64B {	Color 0.66 0.66 0.66	Size 64 }
+POINTLIGHT White64C {	Color 1.00 1.00 1.00	Size 64 }
+FLICKERLIGHT White64AF {	Color 0.33 0.33 0.33	Size 64	secondarySize 72	chance 0.4 }
+FLICKERLIGHT White64BF {	Color 0.66 0.66 0.66	Size 64	secondarySize 72	chance 0.4 }
+FLICKERLIGHT White64CF {	Color 1.00 1.00 1.00	Size 64	secondarySize 72	chance 0.4 }
+POINTLIGHT White128A {	Color 0.33 0.33 0.33	Size 128 }
+POINTLIGHT White128B {	Color 0.66 0.66 0.66	Size 128 }
+POINTLIGHT White128C {	Color 1.00 1.00 1.00	Size 128 }
+FLICKERLIGHT White128AF {	Color 0.33 0.33 0.33	Size 128	secondarySize 160	chance 0.4 }
+FLICKERLIGHT White128BF {	Color 0.66 0.66 0.66	Size 128	secondarySize 160	chance 0.4 }
+FLICKERLIGHT White128CF {	Color 1.00 1.00 1.00	Size 128	secondarySize 160	chance 0.4 }
+
+POINTLIGHT Black32A {	Color 0.33 0.33 0.33	Size 32 Subtractive 1}
+POINTLIGHT Black32B {	Color 0.66 0.66 0.66	Size 32 Subtractive 1}
+POINTLIGHT Black32C {	Color 1.00 1.00 1.00	Size 32 Subtractive 1}
+FLICKERLIGHT Black32AF {	Color 0.33 0.33 0.33	Size 32	secondarySize 48	chance 0.4 Subtractive 1}
+FLICKERLIGHT Black32BF {	Color 0.66 0.66 0.66	Size 32	secondarySize 48	chance 0.4 Subtractive 1}
+FLICKERLIGHT Black32CF {	Color 1.00 1.00 1.00	Size 32	secondarySize 48	chance 0.4 Subtractive 1}
+POINTLIGHT Black64A {	Color 0.33 0.33 0.33	Size 64 Subtractive 1}
+POINTLIGHT Black64B {	Color 0.66 0.66 0.66	Size 64 Subtractive 1}
+POINTLIGHT Black64C {	Color 1.00 1.00 1.00	Size 64 Subtractive 1}
+FLICKERLIGHT Black64AF {	Color 0.33 0.33 0.33	Size 64	secondarySize 72	chance 0.4 Subtractive 1}
+FLICKERLIGHT Black64BF {	Color 0.66 0.66 0.66	Size 64	secondarySize 72	chance 0.4 Subtractive 1}
+FLICKERLIGHT Black64CF {	Color 1.00 1.00 1.00	Size 64	secondarySize 72	chance 0.4 Subtractive 1}
+POINTLIGHT Black128A {	Color 0.33 0.33 0.33	Size 128 Subtractive 1}
+POINTLIGHT Black128B {	Color 0.66 0.66 0.66	Size 128 Subtractive 1}
+POINTLIGHT Black128C {	Color 1.00 1.00 1.00	Size 128 Subtractive 1}
+FLICKERLIGHT Black128AF {	Color 0.33 0.33 0.33	Size 128	secondarySize 160	chance 0.4 Subtractive 1}
+FLICKERLIGHT Black128BF {	Color 0.66 0.66 0.66	Size 128	secondarySize 160	chance 0.4 Subtractive 1}
+FLICKERLIGHT Black128CF {	Color 1.00 1.00 1.00	Size 128	secondarySize 160	chance 0.4 Subtractive 1}
+
+POINTLIGHT Yellow32A {	Color 0.33 0.33 0.00	Size 32 }
+POINTLIGHT Yellow32B {	Color 0.66 0.66 0.00	Size 32 }
+POINTLIGHT Yellow32C {	Color 1.00 1.00 0.00	Size 32 }
+FLICKERLIGHT Yellow32AF {	Color 0.33 0.33 0.00	Size 32	secondarySize 48	chance 0.4 }
+FLICKERLIGHT Yellow32BF {	Color 0.66 0.66 0.00	Size 32	secondarySize 48	chance 0.4 }
+FLICKERLIGHT Yellow32CF {	Color 1.00 1.00 0.00	Size 32	secondarySize 48	chance 0.4 }
+POINTLIGHT Yellow64A {	Color 0.33 0.33 0.00	Size 64 }
+POINTLIGHT Yellow64B {	Color 0.66 0.66 0.00	Size 64 }
+POINTLIGHT Yellow64C {	Color 1.00 1.00 0.00	Size 64 }
+FLICKERLIGHT Yellow64AF {	Color 0.33 0.33 0.00	Size 64	secondarySize 72	chance 0.4 }
+FLICKERLIGHT Yellow64BF {	Color 0.66 0.66 0.00	Size 64	secondarySize 72	chance 0.4 }
+FLICKERLIGHT Yellow64CF {	Color 1.00 1.00 0.00	Size 64	secondarySize 72	chance 0.4 }
+POINTLIGHT Yellow128A {	Color 0.33 0.33 0.00	Size 128 }
+POINTLIGHT Yellow128B {	Color 0.66 0.66 0.00	Size 128 }
+POINTLIGHT Yellow128C {	Color 1.00 1.00 0.00	Size 128 }
+FLICKERLIGHT Yellow128AF {	Color 0.33 0.33 0.00	Size 128	secondarySize 160	chance 0.4 }
+FLICKERLIGHT Yellow128BF {	Color 0.66 0.66 0.00	Size 128	secondarySize 160	chance 0.4 }
+FLICKERLIGHT Yellow128CF {	Color 1.00 1.00 0.00	Size 128	secondarySize 160	chance 0.4 }
+
+
+
+
+BRIGHTMAP SPRITE FRGRA0 { Map "BM/FRGRA0.PNG" }
+BRIGHTMAP SPRITE FLR1A0 { Map "BM/FLR1A0.PNG" }
+BRIGHTMAP SPRITE SPKRA0 { Map "BM/SPKRA0.PNG" }
+BRIGHTMAP SPRITE ENORA0 { Map "BM/ENORA0.PNG" }
+BRIGHTMAP SPRITE HLWTA0 { Map "BM/HLWTA0.PNG" }
+BRIGHTMAP SPRITE HPUPA0 { Map "BM/HPUPA0.PNG" }
+BRIGHTMAP SPRITE HEGRA0 { Map "BM/HEGRA0.PNG" }
+BRIGHTMAP SPRITE STGRA0 { Map "BM/STGRA0.PNG" }
+BRIGHTMAP SPRITE NCRGA0 { Map "BM/NCRGA0.PNG" }
+
+BRIGHTMAP FLAT WHITCEIL { MAP "BM/WHITCEIL.PNG" }
+
+
+GLOW {
+	Texture "TWATER", 333333, 32
+}

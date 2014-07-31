@@ -1,0 +1,42 @@
+ACTOR Resource : Inventory {
+	+INVENTORY.KEEPDEPLETED
+	+INVENTORY.UNTOSSABLE
+	+INVENTORY.UNDROPPABLE
+}
+
+
+ACTOR Cash : Resource {
+	INVENTORY.MaxAmount 0xFFFFFFFF
+}
+
+ACTOR ScrapMetal : Resource {
+	INVENTORY.MaxAmount 999
+}
+
+ACTOR Shards : Resource {
+	INVENTORY.MaxAmount 999
+}
+
+ACTOR Alc_GreenHerb : Resource {
+	INVENTORY.MaxAmount 99
+}
+
+ACTOR Alc_BlueHerb : Resource {
+	INVENTORY.MaxAmount 99
+}
+
+ACTOR Alc_RedHerb : Resource {
+	INVENTORY.MaxAmount 99
+}
+
+ACTOR Alc_Water : Resource {
+	INVENTORY.MaxAmount 99
+}
+
+ACTOR Alc_HolyWater: Resource {
+	INVENTORY.MaxAmount 99
+}
+
+ACTOR Snack: Resource {
+	INVENTORY.MaxAmount 512
+}

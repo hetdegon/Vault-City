@@ -1,0 +1,66 @@
+#library "MAP"
+#include "zcommon.acs"
+
+#define TELELINE_GRACEHEIGHT 	16
+#define TELELINE_MAX				32
+#define TELELINE_MAXDOORS		16
+
+
+#define TELELINE_DATA			3
+#define TELELINE_AMOUNT			0
+#define TELELINE_DOORZ			1
+#define TELELINE_STARTZ			2
+
+#define TELELINE_DOOR_DATA		2
+#define TELELINE_HEIGHT			0
+#define TELELINE_DEST_TID		1
+
+
+int telelines[TELELINE_DATA * TELELINE_MAX];
+int telelines_doordata[TELELINE_MAX][TELELINE_DOOR_DATA * TELELINE_MAXDOORS];
+
+
+
+script "Teleline"(int id) {
+	if(id < 0 || id > TELELINE_MAX) terminate;
+	else {
+		int index = id * TELELINE_DATA;
+		int door_amount = telelines[index + TELELINE_AMOUNT];
+		int sector_startz = telelines[index + TELELINE_STARTZ];
+		int door_height = telelines[index + TELELINE_DOORZ];
+		int actor_height = GetActorZ(0) >> 16;
+		//log(s:"Teleline ID: ", d:id, s:"(doors = ", d:door_amount, s:", door height = ", d:door_height, s:", sector floor = ", d:sector_startz, s:". Call from Z:", d:actor_height);
+		int tid = 0;
+		if (actor_height < sector_startz - TELELINE_GRACEHEIGHT) terminate;
+		else {
+			for(int i = 0; i < door_amount; i++){
+				if(actor_height > telelines_doordata[id][(i * TELELINE_DOOR_DATA) + TELELINE_HEIGHT] - TELELINE_GRACEHEIGHT &&
+					actor_height < telelines_doordata[id][(i * TELELINE_DOOR_DATA) + TELELINE_HEIGHT] + door_height){
+							ACS_NamedExecuteAlways("P_RoomChange", 0, telelines_doordata[id][(i * TELELINE_DOOR_DATA) + TELELINE_DEST_TID], 0, 0);
+				}
+			}
+		}
+	}
+}
+
+function void telelines_set(int id, int door_amount, int door_height, int sector_startz){
+	if(id < 0 || id > TELELINE_MAX) return;
+	int index = id * TELELINE_DATA;
+	telelines[index + TELELINE_AMOUNT] = door_amount;
+	telelines[index + TELELINE_DOORZ] = door_height;
+	telelines[index + TELELINE_STARTZ] = sector_startz;
+}
+
+function void telelines_setroom(int teleline_id, int id, int height, int tid){
+	if(id < 0 || id > TELELINE_MAXDOORS || teleline_id > TELELINE_MAX || id > telelines[(teleline_id * TELELINE_DATA) + TELELINE_AMOUNT]) return;
+	int index = id * TELELINE_DOOR_DATA;
+	telelines_doordata[teleline_id][index + TELELINE_HEIGHT] = height;
+	telelines_doordata[teleline_id][index + TELELINE_DEST_TID] = tid;
+}
+
+script "P_RoomChange"(int destTID) {
+	FadeTo(0, 0, 0, 1.0, 1.0);
+	Delay(35);
+	Teleport_NoFog(destTID, true, 0, false);
+	FadeTo(0, 0, 0, 0.0, 0.5);
+}
