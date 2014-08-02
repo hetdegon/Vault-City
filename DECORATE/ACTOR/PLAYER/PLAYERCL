@@ -76,6 +76,8 @@ ACTOR PlHacker : VCPlayer {
 //Hacker class: Scott Kisaragi
 //Origin: US (father Japanese, born in Japan)
 //Elements: Earth, Electricity
+//Race: Human
+
 	PLAYER.ForwardMove 0.9, 1.0
 	PLAYER.ViewHeight 37
 	PLAYER.DisplayName "Hacker"
@@ -119,12 +121,24 @@ ACTOR PlHacker : VCPlayer {
 			LOOP
 
 		PAIN:
+			PLAY G 4
 			PLAY G 4 A_Pain
 			GOTO SPAWN
 
 		DEATH.EPDIE:
 			TNT1 A 0 A_Log("Your life fades away...")
 			PLAY A -1
+			STOP
+
+		MISSILE:
+		MELEE:
+			GOTO SPAWN
+
+		DEATH:
+		XDEATH:
+			TNT1 A 0 A_PlayerScream
+			TNT1 A 0 A_NoBlocking
+			TNT1 A -1
 			STOP
 	}
 }
@@ -145,6 +159,8 @@ ACTOR PlVampire : VCPlayer {
 //Vampire: Anna Westenra (passing reference to Dracula because screw subtlety)
 //Origin: UK.
 //Elements: Fire, Darkness.
+//Race: Vampire
+
 	PLAYER.ForwardMove 0.95, 1
 	PLAYER.ViewHeight 35
 	PLAYER.DisplayName "Vampire"
@@ -167,9 +183,30 @@ ACTOR PlVampire : VCPlayer {
 			PLAY A -1
 			LOOP
 
+		SEE:
+			PLAY ABCD 4
+			LOOP
+
 		PAIN:
+			PLAY G 4
 			PLAY G 4 A_Pain
 			GOTO SPAWN
+
+		DEATH.EPDIE:
+			TNT1 A 0 A_Log("Your life fades away...")
+			PLAY A -1
+			STOP
+
+		MISSILE:
+		MELEE:
+			GOTO SPAWN
+
+		DEATH:
+		XDEATH:
+			TNT1 A 0 A_PlayerScream
+			TNT1 A 0 A_NoBlocking
+			TNT1 A -1
+			STOP
 	}
 }
 
@@ -182,6 +219,8 @@ ACTOR PlHitman : VCPlayer {
 //Hitman: Dmitry Ivanov Kovalenko
 //Origin: Russia as seen from the eyes of Russian Overkill, comrade.
 //Elements: Cold.
+//Race: Human/Cyborg
+
 	PLAYER.ForwardMove 0.8, 1
 	PLAYER.ViewHeight 40
 	PLAYER.DisplayName "Hitman"
@@ -205,9 +244,30 @@ ACTOR PlHitman : VCPlayer {
 			PLAY A -1
 			LOOP
 
+		SEE:
+			PLAY ABCD 4
+			LOOP
+
 		PAIN:
+			PLAY G 4
 			PLAY G 4 A_Pain
 			GOTO SPAWN
+
+		DEATH.EPDIE:
+			TNT1 A 0 A_Log("Your life fades away...")
+			PLAY A -1
+			STOP
+
+		MISSILE:
+		MELEE:
+			GOTO SPAWN
+
+		DEATH:
+		XDEATH:
+			TNT1 A 0 A_PlayerScream
+			TNT1 A 0 A_NoBlocking
+			TNT1 A -1
+			STOP
 	}
 }
 
@@ -222,6 +282,8 @@ ACTOR PlMagician : VCPlayer {
 //Magician: Shinya Murakumo
 //Origin: Japan
 //Elements: Wind, Fire, Earth, Water.
+//Race: Human
+
 	PLAYER.ForwardMove 0.92, 1
 	PLAYER.ViewHeight 38
 	PLAYER.DisplayName "Magician"
@@ -240,22 +302,173 @@ ACTOR PlMagician : VCPlayer {
 			TNT1 A 0 A_SetUserVar(user_SPgain_SPI, 40) //His training allow his body to drain more life force from food.
 			GOTO SPAWN
 
+			SPAWN:
+				PLAY A -1
+				LOOP
+
+			SEE:
+				PLAY ABCD 4
+				LOOP
+
+			PAIN:
+				PLAY G 4
+				PLAY G 4 A_Pain
+				GOTO SPAWN
+
+			DEATH.EPDIE:
+				TNT1 A 0 A_Log("Your life fades away...")
+				PLAY A -1
+				STOP
+
+			MISSILE:
+			MELEE:
+				GOTO SPAWN
+
+			DEATH:
+			XDEATH:
+				TNT1 A 0 A_PlayerScream
+				TNT1 A 0 A_NoBlocking
+				TNT1 A -1
+				STOP
+	}
+}
+
+Actor PlSchoolkid : VCPlayer {
+//Schoolkid: Roger Anderson
+//Origin: US
+//Elements: ???
+//Race: Human
+
+	PLAYER.ForwardMove 1.0, 1.0
+	PLAYER.ViewHeight 32
+	PLAYER.AirCapacity 0.0
+	PLAYER.DisplayName "Kid"
+	PLAYER.GruntSpeed 52
+
+	STATES{
+		INIT:
+			//Stat setup:
+			TNT1 A 0 A_SetUserVar(user_MHP, 65)
+			TNT1 A 0 A_SetUserVar(user_HPgrowth, 6)
+			TNT1 A 0 A_SetUserVar(user_EP, 256)
+			TNT1 A 0 A_SetUserVar(user_MSP, 100)
+
+			TNT1 A 0 A_SetUserVar(user_SPdecay, 15)
+			TNT1 A 0 A_SetUserVar(user_RestDecay, 10)
+			TNT1 A 0 A_SetUserVar(user_OverflowEP, 5000)
+			TNT1 A 0 A_SetUserVar(user_SPgain_BIO, 100)
+			TNT1 A 0 A_SetUserVar(user_SPgain_MEC, 0) //No mechanic parts or implants, so no gain.
+			TNT1 A 0 A_SetUserVar(user_SPgain_SPI, 1) //Microscopic, probably destroyed by the ACS math, spirit gain.
+			TNT1 A 0 A_SetUserVar(user_AirControl, 100.0)
+			TNT1 A 0 A_SetUserVar(user_Jump, 1) //Single jump
+
+			//Equipment setup: valid ammo classes:
+			GOTO SPAWN
+
 		SPAWN:
 			PLAY A -1
 			LOOP
 
+		SEE:
+			PLAY ABCD 4
+			LOOP
+
 		PAIN:
+			PLAY G 4
 			PLAY G 4 A_Pain
 			GOTO SPAWN
-	}
+
+		DEATH.EPDIE:
+			TNT1 A 0 A_Log("Your life fades away...")
+			PLAY A -1
+			STOP
+
+		MISSILE:
+		MELEE:
+			GOTO SPAWN
+
+		DEATH:
+		XDEATH:
+			TNT1 A 0 A_PlayerScream
+			TNT1 A 0 A_NoBlocking
+			TNT1 A -1
+			STOP
+		}
+}
+
+ACTOR PlSecurity : VCPlayer { //Character for the Curtain Raiser tech preview. Simplest storyline with different mechanics.
+//Security class: Ashley White
+//Origin: Vault City
+//Elements: Earth
+//Race: Human
+
+	PLAYER.ForwardMove 1.0, 1.0
+	PLAYER.ViewHeight 37
+	PLAYER.AirCapacity 0.0
+	PLAYER.DisplayName "Security"
+	PLAYER.GruntSpeed 52
+
+
+	STATES{
+		INIT:
+			//Stat setup:
+			TNT1 A 0 A_SetUserVar(user_MHP, 100)
+			TNT1 A 0 A_SetUserVar(user_HPgrowth, 5)
+			TNT1 A 0 A_SetUserVar(user_EP, 500)
+			TNT1 A 0 A_SetUserVar(user_MSP, 200)
+
+			TNT1 A 0 A_SetUserVar(user_SPdecay, 15)
+			TNT1 A 0 A_SetUserVar(user_RestDecay, 10)
+			TNT1 A 0 A_SetUserVar(user_OverflowEP, 5000)
+			TNT1 A 0 A_SetUserVar(user_SPgain_BIO, 100)
+			TNT1 A 0 A_SetUserVar(user_SPgain_MEC, 0) //No mechanic parts or implants, so no gain.
+			TNT1 A 0 A_SetUserVar(user_SPgain_SPI, 1) //Microscopic, probably destroyed by the ACS math, spirit gain.
+			TNT1 A 0 A_SetUserVar(user_AirControl, 100.0)
+			TNT1 A 0 A_SetUserVar(user_Jump, 1) //Single jump
+
+			//Equipment setup: valid ammo classes:
+			TNT1 A 0 A_GiveInventory("A_Pistol")
+			GOTO SPAWN
+
+		SPAWN:
+			PLAY A -1
+			LOOP
+
+		SEE:
+			PLAY ABCD 4
+			LOOP
+
+		PAIN:
+			PLAY G 4
+			PLAY G 4 A_Pain
+			GOTO SPAWN
+
+		DEATH.EPDIE:
+			TNT1 A 0 A_Log("Your life fades away...")
+			PLAY A -1
+			STOP
+
+		MISSILE:
+		MELEE:
+			GOTO SPAWN
+
+		DEATH:
+		XDEATH:
+			TNT1 A 0 A_PlayerScream
+			TNT1 A 0 A_NoBlocking
+			TNT1 A -1
+			STOP
+		}
 }
 
 ACTOR PlTrickster : VCPlayer { //Extra character. How to hide from initial selection?
 //Trickster class: A-0A-DT-MAGPIE "Magpie A"
-//Origin: The Sealed Dimension (Millennium Technologists HQ, activated at an unknown location)
-//Elements: Wind, Electricity, Gravity.
+//Origin: Millennium Technologists laboratory
+//Elements: Wind, Electricity, Gravity
+//Race: Evolter
+
 	PLAYER.ForwardMove 1.0, 1.0
-	PLAYER.ViewHeight 32
+	PLAYER.ViewHeight 30
 	PLAYER.AirCapacity 0.0
 	PLAYER.DisplayName "Trickster"
 	PLAYER.StartItem "TK_REDTALON"
@@ -326,4 +539,14 @@ ACTOR PlTrickster : VCPlayer { //Extra character. How to hide from initial selec
 }
 
 Actor PlMagpie : PlTrickster {
+//Magpie's real form
+	PLAYER.ViewHeight 72
+}
+
+
+//Placeholders: Not sure if worth making, we'll see.
+Actor PlDetective: VCPlayer {
+}
+
+Actor PlNurse : VCPlayer {
 }

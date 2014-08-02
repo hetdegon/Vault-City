@@ -1,3 +1,9 @@
+//Doom compatibility thingamajig
+//Eventually this will form part of a compatibility layer of sorts, in order to play the bulk of Doom maps
+//with VC characters. Doom demons will be adapted in abilities and powers to the general setup of Vault City.
+
+
+
 ACTOR AC_Raiser {
 	Radius 4
 	Height 4
