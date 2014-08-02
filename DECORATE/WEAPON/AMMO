@@ -5,18 +5,6 @@ ACTOR AmmoBox : CustomInventory {
 	INVENTORY.MaxAmount 999
 }
 
-ACTOR ValidAmmoToken : Inventory {
-	INVENTORY.MaxAmount 1
-}
-
-
-//Tokens used to check if a type of ammo can be equipped by a character.
-ACTOR A_Pistol : ValidAmmoToken {}
-ACTOR A_Rifle : ValidAmmoToken {}
-ACTOR A_Shotgun : ValidAmmoToken {}
-ACTOR A_Grenade : ValidAmmoToken {}
-ACTOR A_Spiker: ValidAmmoToken {}
-
 ACTOR A_Pistol0 : AmmoBox { //☚DEFAULT
 //9mm standard ammunition. Range: ** DMG: Impact
 	TAG "9mm Standard"
