@@ -5,7 +5,7 @@ DEFAULTMAP {
 	AllowJump
 	AllowCrouch
 	AllowFreelook
-	SmoothLighting
+	SmoothLighting //TODO:Actually, this should be removed, and the walls should be lighted manually....
 	UsePlayerStartZ
 	SpawnWithWeaponRaised
 	FogDensity = 32

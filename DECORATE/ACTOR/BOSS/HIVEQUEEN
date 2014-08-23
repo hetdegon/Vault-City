@@ -1,0 +1,192 @@
+ACTOR BOSS_HiveQueen {
+	Health 1200
+	Species "Boss"
+	Speed 24
+	MONSTER
+	+NOGRAVITY
+	+FLOAT
+	STATES{
+		SPAWN:
+			WARN A 35 NODELAY A_SpawnItemEx("BOSS_HiveQueen_DroneA", 12.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, SXF_SETMASTER)
+			WARN A 35 A_SpawnItemEx("BOSS_HiveQueen_DroneA", -12.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, SXF_SETMASTER)
+			WARN A 35 A_SpawnItemEx("BOSS_HiveQueen_DroneA", 0.0, 12.0, 0.0, 0.0, 0.0, 0.0, 0.0, SXF_SETMASTER)
+			WARN A 35 A_SpawnItemEx("BOSS_HiveQueen_DroneA", 0.0, -12.0, 0.0, 0.0, 0.0, 0.0, 0.0, SXF_SETMASTER)
+			WARN A 4 A_Look
+			GOTO SEE
+
+		SEE:
+			WARN A 8 A_Chase
+			LOOP
+
+		MISSILE:
+		MELEE:
+			WARN A 0 A_CustomMissile("MSL_TestMissile", 0.0, 0, 0.0)
+			WARN A 0 A_CustomMissile("MSL_TestMissile", 0.0, 0, 45.0)
+			WARN A 0 A_CustomMissile("MSL_TestMissile", 0.0, 0, 90.0)
+			WARN A 0 A_CustomMissile("MSL_TestMissile", 0.0, 0, 135.0)
+			WARN A 0 A_CustomMissile("MSL_TestMissile", 0.0, 0, 180.0)
+			WARN A 0 A_CustomMissile("MSL_TestMissile", 0.0, 0, 225.0)
+			WARN A 0 A_CustomMissile("MSL_TestMissile", 0.0, 0, 270.0)
+			WARN A 0 A_CustomMissile("MSL_TestMissile", 0.0, 0, 315.0)
+			TNT1 A 0 A_SetDamageType("BOSS_Activate")
+			TNT1 A 0 A_PlaySound("BEEPS1")
+			WARN A 0 A_Explode(1, 32, XF_NOTMISSILE, true, 32, 0, 0)
+			WARN A 70
+			GOTO SEE
+
+		DEATH:
+			TNT1 A 0
+			STOP
+
+	}
+
+}
+
+ACTOR BOSS_HiveQueen_DroneA {
+	Health 500
+	Speed 0
+	Scale 0.5
+	Species "Boss"
+	PainChance "BOSS_Activate", 255
+
+	MONSTER
+	+NOGRAVITY
+	-SOLID
+	+NOCLIP
+
+
+
+	var int user_angle;
+	STATES{
+		SPAWN:
+			WARN A 4 NODELAY A_Warp(AAPTR_MASTER, 24, 0, 24, user_angle, WARPF_ABSOLUTEANGLE|WARPF_INTERPOLATE|WARPF_NOCHECKPOSITION)
+			TNT1 A 0 A_SetUserVar("user_angle", user_angle + 8)
+			LOOP
+
+		DEATH:
+			TNT1 A 0 A_SpawnItemEx("FX_Explode")
+			STOP
+
+		PAIN.BOSS_Activate:
+			TNT1 A 0 A_PlaySound("PEW")
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			TNT1 A 0 A_Warp(AAPTR_MASTER, 24, 0, 24, user_angle, WARPF_ABSOLUTEANGLE|WARPF_INTERPOLATE|WARPF_NOCHECKPOSITION)
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			TNT1 A 0 A_PlaySound("PEW")
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			TNT1 A 0 A_Warp(AAPTR_MASTER, 24, 0, 24, user_angle, WARPF_ABSOLUTEANGLE|WARPF_INTERPOLATE|WARPF_NOCHECKPOSITION)
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			WARN A 4 A_SpawnItemEx("MSL_TestMissile4")
+			TNT1 A 0 A_Warp(AAPTR_MASTER, 24, 0, 24, user_angle, WARPF_ABSOLUTEANGLE|WARPF_INTERPOLATE|WARPF_NOCHECKPOSITION)
+			GOTO SPAWN
+	}
+
+}
+
+
+
+ACTOR MSL_TestMissile {
+	Speed 32.0
+	PROJECTILE
+	+NOBLOCKMAP
+	+NOGRAVITY
+	+CEILINGHUGGER
+	-RANDOMIZE
+	STATES{
+		SPAWN:
+			TNT1 A 4 NODELAY A_SpawnItemEx("MSL_TestMissile2")
+			TNT1 A 4 A_SpawnItemEx("MSL_TestMissile2")
+			TNT1 A 4 A_SpawnItemEx("MSL_TestMissile2")
+			TNT1 A 4 A_SpawnItemEx("MSL_TestMissile2")
+			TNT1 A 4 A_SpawnItemEx("MSL_TestMissile2")
+			TNT1 A 4 A_SpawnItemEx("MSL_TestMissile2")
+			TNT1 A 4 A_SpawnItemEx("MSL_TestMissile2")
+			TNT1 A 8 A_SpawnItemEx("MSL_TestMissile2")
+		DEATH:
+			TNT1 A 0 A_SpawnItemEx("FX_Explode")
+			STOP
+	}
+}
+
+ACTOR MSL_TestMissile3 {
+	Height 16
+	Radius 8
+	Damage 24
+	Translation "0:255=%[0.00,0.00,0.00]:[0.84,0.87,2.00]"
+	Species "Boss"
+	PROJECTILE
+	+SPAWNCEILING
+	+BRIGHT
+	+NOGRAVITY
+	+THRUSPECIES
+	STATES{
+		SPAWN:
+			VESH B -1 NODELAY A_ChangeVelocity(0.0, 0.0, -52.0, CVF_REPLACE)
+			STOP
+		DEATH:
+			TNT1 A 0 A_SpawnItemEx("FX_Explode")
+			STOP
+	}
+}
+
+ACTOR MSL_TestMissile4 {
+	Height 16
+	Radius 6
+	Translation "0:255=%[0.00,0.00,0.00]:[0.84,0.87,2.00]"
+	Species "Boss"
+	SeeSound "PEW"
+	PROJECTILE
+	+SPAWNCEILING
+	+BRIGHT
+	+NOGRAVITY
+	+THRUSPECIES
+	STATES{
+		SPAWN:
+			VESH A -1 NODELAY A_ChangeVelocity(0.0, 0.0, 52.0, CVF_REPLACE)
+			STOP
+		DEATH:
+			TNT1 A 0 A_SpawnItemEx("FX_Explode")
+			STOP
+	}
+}
+
+ACTOR MSL_TestMissileBeacon {
+	Height 1
+	Radius 1
+	PROJECTILE
+	+BRIGHT
+	+NOGRAVITY
+	STATES{
+		SPAWN:
+			TNT1 A -1 NODELAY A_ChangeVelocity(0.0, 0.0, -1024.0, CVF_REPLACE)
+			STOP
+		DEATH:
+			TNT1 A 0 A_SpawnItemEx("FX_Warning0")
+			STOP
+	}
+}
+
+ACTOR MSL_TestMissile2 {
+	Height 0
+	Radius 0
+	+NOGRAVITY
+	+NOBLOCKMAP
+	+FLOAT
+	STATES{
+		SPAWN:
+			TNT1 A 75 NODELAY A_SpawnItemEx("MSL_TestMissileBeacon")
+			TNT1 A 6 A_SpawnItemEx("MSL_TestMissile3")
+			TNT1 A 6 A_SpawnItemEx("MSL_TestMissile3")
+			TNT1 A 6 A_SpawnItemEx("MSL_TestMissile3")
+			TNT1 A 6 A_SpawnItemEx("MSL_TestMissile3")
+			TNT1 A 6 A_SpawnItemEx("MSL_TestMissile3")
+			STOP
+	}
+}

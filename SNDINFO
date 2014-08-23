@@ -3,6 +3,7 @@ STEAM STEAM
 BEEPS1 BEEPS1
 EVILNO EVILNO
 WAVES WAVES
+PEW PEW
 
 $ambient 1 WAVES point continuous 3.0
 $pitchshift WAVES 3
