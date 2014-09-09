@@ -31,7 +31,7 @@ Gets a giant robot.*
 ## Extra characters ##
 **Sec-Guard** (*Ashley White*): A security guard in a local lab will find herself trapped alone against a rogue mechanoid...
 *You only have access to a basic pistol, and survival is tough due to the intricacies of the location.
-Fighting a way to fight back is the main target of this scenario.*
+Finding a way to fight back is the main target of this scenario.*
 
 **Schoolboy** (*Roger Anderson*): Can you win against the strongest of all bullies?
 *A more adventurey scenario where you have to recruit other kids which determine your loadout in the crazy final battle.*
